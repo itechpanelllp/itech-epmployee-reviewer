@@ -1,0 +1,157 @@
+<%- include('../../common/header', title) %>
+<div class="row mt-4">
+    <div id="loader"></div>
+    <div class="col-12 col-xl-12 grid-margin stretch-card">
+        <div class="card overflow-hidden">
+            <div class="card-body">
+                <form class="" id="addRole" action="<%= base_url %><%= roleData ? update_role : add_role %>" >
+                    <div class="row g-3 mb-3">
+                        <!-- role name -->
+                        <div class="col-md-4">
+                            <label class="form-label required_field"> <%=__("Role name") %><span
+                                    class="text-danger"><%=__("*") %>
+                                </span></label>
+                            <input type="text" class="form-control" id="rolename" name="roleName"
+                                value="<%= roleData.role_name %>" />
+                            <span id="roleNameError" class="text-danger errorRemove"></span>
+                        </div>
+                        <% if(!roleData)  { %>
+                        <!-- role status -->
+                        <div class="col-md-4">
+                            <label class="form-label required_field"><%=__("Role status") %></label>
+                            <select class="form-label form-control" id="roleStatus" name="roleStatus">
+                                <option value="1"><%=__("Enable") %></option>
+                                <option value="0"><%=__("Disable") %></option>
+                            </select>
+                            <span id="roleStatusError" class="text-danger errorRemove"></span>
+                        </div>
+                        <% } %>
+                        <!-- permission -->
+                        <div class="col-12">
+                            <div class="d-flex gap-3 flex-column mb-3">
+                                <label class="form-label"><%= __("Permission") %></label>
+                                <div class="permission_name permission-item">
+                                    <% if (menusList?.length) { %>
+                                    <% const selectedPermissions = roleData.permissions ? JSON.parse(roleData.permissions) : ''; %>
+
+                                    <% menusList.forEach(item => { %>
+                                        
+                                    <div>
+                                        <div class="d-flex gap-2 permission-parent">
+                                            <div class="d-flex gap-2 permission-checkbox-parent">
+                                                <% if (item.url !== 'javascript:void(0)') { %>
+                                                <input type="checkbox" class="form-check-input"
+                                                    data-name="<%= item.code %>" id="<%= item.id %>"
+                                                    <%= selectedPermissions[item.code]?.includes('view') ? 'checked' : '' %> />
+                                                <% } %>
+                                                <label class="form-check-label"
+                                                    for="<%= item.id %>"><%= item.name %></label>
+                                            </div>
+                                        </div>
+
+                                        <% if (item.children?.length) { %>
+                                        <% item.children.forEach(child => { %>
+                                        <div class="d-flex flex-column pl-4 gap_class">
+                                            <div class="d-flex gap-2 permission-parent">
+                                                <div class="d-flex gap-2 permission-checkbox-parent">
+                                                    <input type="checkbox" class="form-check-input"
+                                                        data-name="<%= child.code %>" id="<%= child.id %>"
+                                                        <%= selectedPermissions[child.code]?.includes('view') ? 'checked' : '' %> />
+                                                    <label class="form-check-label"
+                                                        for="<%= child.id %>"><%= child.name %></label>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-4 flex-wrap permission-child">
+                                                <%- renderActions(item.code, child.id, selectedPermissions[child.code]) %>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                        <% } else { %>
+                                        <div class="d-flex gap-4 flex-wrap permission-child">
+                                            <%- renderActions(item.code, item.id, selectedPermissions[item.code]) %>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <% }) %>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                   <% function renderActions(code, id, permission) { %>
+                    <% if (code === 'dashboard') return ''; %>
+                    <% const actions = ['add', 'update', 'delete']; %>
+                    <% actions.forEach(a => { %>
+                        <div class="d-flex gap-2 flex-wrap permission-checkbox-child">
+                        <input type="checkbox" class="form-check-input" value="<%= a %>" id="<%= a + '_' + id %>" <%= permission?.includes(a) ? 'checked' : '' %> />
+                        <label for="<%= a + '_' + id %>" class="form-check-label"><%= __(a.charAt(0).toUpperCase() + a.slice(1)) %></label>
+                        </div>
+                    <% }); %>
+                    <% } %>
+
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../common/footer') %>
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+        // parent checked than all child checked
+        $('.permission-checkbox-parent input').on('change', function () {
+            $(this).closest('.permission-parent').next('.permission-child').find('input').prop('checked', this.checked);
+        });
+
+        // child checked than parent checked
+        $('.permission-checkbox-child input').on('change', function () {
+            const parent = $(this).closest('.permission-child').prev('.permission-parent').find('input');
+            parent.prop('checked', $(this).closest('.permission-child').find('input:checked'));
+        });
+
+        $('#addRole').on('input change', e => $('.errorRemove', e.target.parentElement).empty());
+
+        // form submit
+        $('#addRole').submit(function (e) {
+            e.preventDefault();
+            $('#loader').show();
+            const permissions = {};
+            $('.permission-checkbox-parent input:checked').each(function () {
+                const name = $(this).data('name');
+                const child = $(this).closest('.permission-parent').next('.permission-child').find('input:checked');
+                const perms = { view: true };
+                child.each((_, el) => perms[el.value] = true);
+                if (Object.keys(perms).length) permissions[name] = Object.keys(perms);
+            });
+
+            const formData = $(this).serializeArray();
+            formData.push({ name: 'permissions', value: JSON.stringify(permissions) });
+            $.post($(this).attr('action'), formData).done(res => {
+                $('#loader').hide();
+                if (res.errors) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    Object.keys(res.errors).forEach(field => $(`#${field}Error`).text(res.errors[field]));
+                } else {
+                    showMsg(res.success || res.error, res.success ? "success" : "danger");
+                    if (res.success) setTimeout(() => location.reload(), 1500);
+                }
+            });
+        });
+        // Function to show messages
+        function showMsg(msg, type = "danger") {
+            $('.toast-container').removeClass('d-none').find('.toast-body').addClass(`alert alert-${type}`).text(msg);
+            setTimeout(() => {
+                $('.toast-body').removeClass(`alert alert-${type}`).text('');
+                $('.toast-container').addClass('d-none');
+                $('#loader').hide();
+            }, 1000);
+        }
+
+
+    });    
+</script>

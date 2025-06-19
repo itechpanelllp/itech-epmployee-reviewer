@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard | Skote - Admin & Dashboard Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="<%= base_url %>assets/images/logo.jpg">
+
+    <!-- Bootstrap Css -->
+    <link href="<%= base_url %>assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="<%= base_url %>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="<%= base_url %>assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/dataTables.bootstrap4.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/responsive.bootstrap4.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/style.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/sweetalert2.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="<%= base_url %>assets/css/select2.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- App js -->
+ 
+</head>
+
+<body data-sidebar="dark">
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+        <header id="page-topbar">
+            <div class="navbar-header">
+                <div class="d-flex">
+                    <!-- LOGO -->
+                    <div class="navbar-brand-box">
+                        <a href="#" class="logo logo-dark">
+                            <span class="logo-sm">
+                                <img src="assets/images/logo.svg" alt="" height="22">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="assets/images/logo-dark.png" alt="" height="17">
+                            </span>
+                        </a>
+
+                        <a href="#" class="logo logo-light">
+                            <span class="logo-sm">
+                                <img src="assets/images/logo-light.svg" alt="" height="22">
+                            </span>
+                            <span class="logo-lg">
+                                <img src="assets/images/logo-light.png" alt="" height="19">
+                            </span>
+                        </a>
+                    </div>
+
+                    <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect"
+                        id="vertical-menu-btn">
+                        <i class="fa fa-fw fa-bars"></i>
+                    </button>
+                </div>
+
+                <div class="d-flex">
+                    <div class="dropdown d-inline-block">
+                        <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="rounded-circle header-profile-user" src="<%= base_url %><%= userData.profileImg ? img_url + userData.profileImg : 'assets/images/customer_placeholder.jpg'%>"
+                                alt="Header Avatar">
+                                 <% var name = userData?.firstname ? `${userData.firstname} ${userData.lastname || ''}`.trim() : '' %>
+                            <span class="d-none d-xl-inline-block ms-1" key="t-henry"><%= name %></span>
+                            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- item-->
+                            <a class="dropdown-item" href="<%= base_url + userProfile %>"><i class="bx bx-user font-size-16 align-middle me-1"></i>
+                                <span key="t-profile">Profile</span></a>
+                            <a class="dropdown-item" href="#"><i
+                                    class="bx bx-wallet font-size-16 align-middle me-1"></i> <span key="t-my-wallet">My
+                                    Wallet</span></a>
+                            <a class="dropdown-item d-block" href="#"><span
+                                    class="badge bg-success float-end">11</span><i
+                                    class="bx bx-wrench font-size-16 align-middle me-1"></i> <span
+                                    key="t-settings">Settings</span></a>
+                            <a class="dropdown-item" href="#"><i
+                                    class="bx bx-lock-open font-size-16 align-middle me-1"></i> <span
+                                    key="t-lock-screen">Lock screen</span></a>
+                            <div class="dropdown-divider"></div>
+                              <button type="button" class="text-body ms-0 border-0 bg-transparent dropdown-item" onclick="showSwal('warning-message-logout','<%= userLogout %>', '0') "><i class="mdi mdi-logout font-size-16 align-middle me-1"></i><%=__("Logout") %></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== Left Sidebar Start ========== -->
+        <%- include('../common/sidebar.ejs') %>
+            <div class="toast-container position-fixed p-3 end-0 d-none" id="toastPlacement"
+            data-original-class="toast-container position-absolute p-3">
+            <div class="toast fade show d-inline-block opacity-1">
+                <div class="toast-body mb-0">
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="page-content">
+                
+            
+            <!-- End Page-content -->
+
+
+         

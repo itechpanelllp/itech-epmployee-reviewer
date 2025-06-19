@@ -1,0 +1,98 @@
+/* permission */
+.permission-parent {
+  background-color: #e9e9ef;
+  padding: 12px;
+}
+.permission-item {
+  border: 1px solid #e9e9ef;
+  border-radius: 10px;
+}
+.permission-child {
+  background-color: #fbfaff;
+  padding: 12px;
+}
+input[type="checkbox"] {
+  border-color: black;
+}
+.gap_class {
+  margin: 10px 0 0 10px;
+}
+.select2-container--default .select2-selection--single {
+  background-color: #f8f9fa !important;
+  border: var(--bs-border-width) solid var(--bs-border-color) !important;
+  border-radius: 4px;
+  height: 100% !important;
+  padding: 4px 0px;
+  min-height: 37.63px;
+  max-height: 38px;
+}
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__arrow {
+  height: 26px;
+  position: absolute;
+  top: 6px !important;
+  right: 8px !important;
+  width: 20px;
+}
+.select2 {
+  width: 100% !important;
+}
+.cover_style {
+  display: flex;
+  height: 200px;
+  margin-bottom: 20px;
+}
+.demo-image {
+  background: #7f7d7d1c !important;
+  height: 200px !important;
+}
+.uploadImg {
+  overflow: hidden;
+  position: relative;
+  width: 50%;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.uploadImg img {
+  width: 100%;
+  object-fit: cover;
+}
+.uploadImg .location-image img {
+  width: 100%;
+  object-fit: cover;
+  height: 100%;
+}
+.uploadImg span {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background-color: #fff;
+  border-radius: 20px;
+  height: 35px;
+  width: 35px;
+  text-align: center;
+  line-height: 35px;
+  cursor: pointer;
+}
+.uploadImg span input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: -1;
+}
+.removeImageBtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 20%;
+  width: 24px;
+  height: 24px;
+  line-height: 20px;
+  display: none;
+  cursor: pointer;
+}

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="<%= base_url %>assets/images/logo.jpg">
+
+    <!-- Bootstrap Css -->
+    <link href="<%= base_url %>assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="<%= base_url %>assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="<%= base_url %>assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+
+
+</head>
+
+<body>
+    <div class="account-pages my-5 pt-sm-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="card overflow-hidden">
+                        <div class="bg-primary-subtle">
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="text-primary p-4">
+                                        <h5 class="text-primary">Welcome Back !</h5>
+                                        <p>Sign in to continue to ItechPanel.</p>
+                                    </div>
+                                </div>
+                                <div class="col-5 align-self-end">
+                                    <img src="<%= base_url %>assets/images/profile-img.png" alt="" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                             <div>
+                                    <a href="#">
+                                        <div class="avatar-md profile-user-wid mb-4">
+                                            <span class="avatar-title rounded-circle bg-light">
+                                                <img src="<%= base_url %>assets/images/logo.jpg" alt="" class="rounded-circle" height="34">
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                         
+
+                            <div class="p-2 mt-3">
+                                <div id="msg"></div>
+                           <form id="twoFactor">
+                                <div class="d-flex gap-3 mb-3">
+                                    <% for(let i=0; i<6; i++) { %>
+                                    <input type="text" class="form-control text-center two-step digit number_validation" maxlength="1"
+                                        name="token" autocomplete="off" />
+                                    <% } %>
+                                </div>
+                                <div class="float-end mb-3">
+                                    <button type="submit"class="btn btn-primary waves-effect waves-light"><%=__("Verify") %></button>
+                                    
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!-- JAVASCRIPT -->
+    <script src="<%= base_url %>assets/js/jquery.min.js"></script>
+    <script src="<%= base_url %>assets/js/bootstrap.bundle.min.js"></script>
+    <script src="<%= base_url %>assets/js/metisMenu.min.js"></script>
+    <script src="<%= base_url %>assets/js/simplebar.min.js"></script>
+    <script src="<%= base_url %>assets/js/waves.min.js"></script>
+    <script src="<%= base_url %>assets/js/app.js"></script>
+</body>
+
+</html>
+<script>
+      
+    $(document).ready(function () {
+        // Focus first token input
+        $('input[name="token"]').first().focus();
+
+        // Number validation
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+        // Input navigation for token fields
+        $('input[name="token"]').on('input keydown', function (e) {
+            if (e.type === 'input' && this.value) $(this).next().focus();
+            else if (e.key === 'Backspace' && !this.value) $(this).prev().focus();
+        });
+
+        // Submit form after combining token values
+        $('#twoFactor').submit(function (e) {
+            e.preventDefault();
+            const tokenValue = $('input[name="token"]').map((_, input) => input.value).get().join('');
+            if (tokenValue.length !== 6) {
+                showMsg(`<%=__("Please fill in all token fields") %>`, "danger");
+                return;
+            }
+            $.post(`<%= base_url + two_factor_action %>`, { code: tokenValue, token: `<%= token %>` }).done(res => {
+                showMsg(res.success || res.error, res.success ? "success" : "danger");
+                if (res.success) setTimeout(() => window.location.href = "<%= base_url %>", 1500);
+            });
+        });
+
+      
+        // Show message function
+        function showMsg(msg, type = "danger") {
+            $("#msg").addClass(`alert alert-${type}`).text(msg).delay(1500).queue(function (next) {
+                $(this).removeClass(`alert alert-${type}`).text("");
+                next();
+            });
+        }
+    });
+</script>

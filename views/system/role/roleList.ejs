@@ -1,0 +1,97 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+
+<div class="d-flex justify-content-end mb-4">
+    <a href="<%= base_url + add_role %>" class="btn btn-primary"><%=__("Add-role") %></a>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="roleTable" class="table table-bordered dt-responsive  nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th><%=__("Role name") %></th>
+                            <th><%=__("Status") %></th>
+                            <th><%=__("Created date") %></th>
+                            <th><%=__("Action") %></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<%- include('../../common/footer') %>
+<script>
+  var dataTable= '';
+  function roleDelete(type, url, id) {
+        if (type !== 'delete-role') return;
+        Swal.fire({
+            title: `<%=__("Are you sure ?") %>`,
+            text:  `<%=__("Are you sure you want to delete this role ?") %>`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: `<%=__("Yes, delete!") %>`,
+            cancelButtonText: `<%=__("No, cancel!") %>`,
+            customClass: { confirmButton: "btn btn-success", cancelButton: "btn btn-danger me-2" },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+                $.post(`${$baseurl + url}${id}`).done(res => {
+                    if (res.success) dataTable.draw();
+                });
+            }
+        });
+    }
+    $(document).ready(function(){
+        setTimeout(() => $('#loader').hide(), 300);
+        // DataTable setup
+        dataTable = $('#roleTable').DataTable({
+          'processing': true,
+          'serverSide': true,
+          'serverMethod': 'post',
+          'ajax': {
+            'url': `<%= base_url + role_dataTable %>`,
+          },
+         
+          'columns': [
+            { data: 'role_name' },
+            { data: 'status' },
+            { data: 'created_at' },
+            { data: 'action', orderable: false },
+          ],
+          'order': [[0, 'DESC']],
+          'lengthMenu': [[10, 20, 50, 100, 200]],
+          'searching': true,
+          'lengthChange': false,
+        });
+
+        // change status of role
+        $(document).on('change', '.role_status', function() {
+            const id = $(this).attr('row-id');
+            const status = $(this).data('status') ^ 1;
+            $.post(`<%= base_url + role_status %>`, { id, status }).done(res => {
+                showMsg(res.success || res.error, res.success ? "success" : "danger");
+                dataTable.draw();
+            });
+        });
+
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.toggleClass('d-none', !msg).find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+
+    });
+</script>
+    
+
+
+
+

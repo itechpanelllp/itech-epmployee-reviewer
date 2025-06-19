@@ -1,0 +1,332 @@
+<%- include("../common/header", title) %>
+
+<div class="row mt-4">
+    <div id="loader"></div>
+    <div class="col-12 col-xl-12 grid-margin stretch-card">
+        <div class="card overflow-hidden">
+            <div class="card-body">
+                <form class="" id="profile" action="<%= base_url + profile_update %>" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- first name -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-text-input"
+                                class="form-label required_field"><%=__("First name") %><span
+                                    class="text-danger"><%=__("*") %></span></label>
+                            <input class="form-control" type="text" value="<%= data.firstname %>" id="fname"
+                                name="fname" placeholder="<%=__("First name") %>">
+                            <span id="fnameError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- last name -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-text-input" class="form-label"><%=__("Last name") %></label>
+                            <input class="form-control" type="text" value="<%= data.lastname ?  data.lastname : '' %>"
+                                id="lname" name="lname" placeholder="<%=__("Last name") %>">
+                            <span id="lnameError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- email -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-email-input" class="form-label required_field"><%=__("Email") %><span
+                                    class="text-danger"><%=__("*") %></span></label>
+                            <input class="form-control" readonly type="text" id="email" name="email"
+                                placeholder="<%=__("Email") %>" value="<%= data.email %>">
+                            <span id="emailError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- phoneNumber -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-url-input"
+                                class="form-label required_field"><%=__("Phone number") %></label>
+                            <input type="text" class="form-control number_validation" id="phoneNumber"
+                                name="phoneNumber" placeholder="<%=__("Phone number") %>"
+                                value="<%= data.phoneNumber %>">
+                            <span id="phoneNumberError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- password -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-tel-input" class="form-label"><%=__("Password") %></label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="<%=__("Password") %>">
+                            <span id="passwordError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- country -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="choices-single-default"
+                                class="form-label required_field"><%=__("Country") %></label>
+                            <select data-trigger name="user[country]" id="choices-single-default"
+                                class="form-select country">
+                                <option value><%=__("Select country") %></option>
+                                <% if(country && country!='') { %>
+                                <% country.forEach( item => { %>
+                                <option value="<%= item.id %>"><%= item.name %></option>
+                                <% }) %>
+
+                                <% } %>
+                            </select>
+                            <span id="user.countryError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- state       -->
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label required_field"><%=__("State") %></label>
+                            <select class="form-select state" id="state" name="user[state]">
+                                <option value><%=__("Select state") %></option>
+                            </select>
+                            <span id="user.stateError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- city -->
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label required_field"><%=__("City") %></label>
+                            <select class="form-select city" id="city" name="user[city]">
+                                <option value><%=__("Select city") %></option>
+
+                            </select>
+                            <span id="user.cityError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- address -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-url-input" class="form-label required_field"><%=__("Address") %></label>
+                            <input type="text" class="form-control" id="address" name="user[address]"
+                                placeholder="<%=__("Address") %>" value="<%= metaData.find(item => item.meta_key == 'address')?.meta_value || '' %>">
+                            <span id="user.addressError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- postal code -->
+                        <div class="mb-3 col-lg-6">
+                            <label for="example-url-input"
+                                class="form-label required_field"><%=__("Postal code") %></label>
+                            <input type="text" class="form-control number_validation" id="postal_code"
+                                name="user[postal_code]" placeholder="<%=__("Postal code") %>" value="<%= metaData.find(item => item.meta_key == 'postal_code')?.meta_value || '' %>">
+                            <span id="user.postal_codeError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- role -->
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label required_field"><%=__("Role") %><span
+                                    class="text-danger"><%=__("*") %></span></label>
+                            <select class="form-select" id="userRole" name="role">
+                                <% role.forEach( item => { %>
+                                <% if(data.role == item.id) { %>
+                                <option value="<%= item.id %>" <%= data.role == item.id ? 'selected' : '' %>>
+                                    <%= item.role_name %></option>
+                                <% } %>
+                                <% }) %>
+                            </select>
+                            <span id="roleError" class="text-danger errorRemove"></span>
+                        </div>
+                        <!-- status -->
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label required_field"><%=__("Status") %><span
+                                    class="text-danger"><%=__("*") %></span></label>
+                            <select class="form-select" id="userStatus" name="status">
+                                <% if(data.status == '1') { %>
+                                <option value="1" <%= data.status == '1' ? 'selected' : '' %>><%=__("Enable") %>
+                                </option>
+                                <% }else{ %>
+                                <option value="0" <%= data.status == '0' ? 'selected' : '' %>><%=__("Disable") %>
+                                </option>
+                                <% } %>
+                            </select>
+                            <span id="statusError" class="text-danger errorRemove"></span>
+                        </div>
+                    </div>
+                    <!-- two factor Authenticator  -->
+                    <div class="row">
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label"> <%=__("Two-factor authentication") %></label>
+                            <select class="form-label form-control" id="twoFactorStatus" name="twoFactorStatus"
+                                data-key="<%= secret %>">
+                                <option value="0" <%= data.twoFactor_status == 0 ? 'selected' : '' %>>
+                                    <%= __("Disable") %></option>
+                                <option value="1" <%= data.twoFactor_status == 1 ? 'selected' : '' %>><%=__("Enable") %>
+                                </option>
+                            </select>
+                            <span id="twoFactorStatusError" class="text-danger errorRemove"></span>
+                        </div>
+                        <div class="mb-4 showQrcode">
+                            <h5><%=__("Scan the QR Code with your authenticator app") %></h5>
+                            <img src="<%= qrcode %>" alt="2FA QR Code" />
+                        </div>
+                    </div>
+
+                    <div class="row twofactorCode">
+                        <div class="mb-3 col-lg-6">
+                            <div class="d-flex gap-3 mb-3">
+                                <% for(let i=0; i<6; i++) { %>
+                                <input type="text" class="form-control text-center two-step digit number_validation"
+                                    maxlength="1" name="token" autocomplete="off" />
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- upload profile image -->
+                    <div class="col-lg-6 mt-3">
+                        <label class="form-label"><%= __("Profile image") %></label>
+                        <div class="position-relative">
+                            <label for="profileImg" class="uploadImg demo-image location-image mb-3">
+                                <%  let profileImage = metaData.find(item => item.meta_key == 'profile_img')?.meta_value || '';
+                                    const previewImg = profileImage ? base_url + img_url + profileImage : base_url + 'assets/images/placeholder.jpg';
+                                    const displayStyle = profileImage ? 'block' : 'none';
+                                %>
+                                <div id="previewWrapper" style="position: relative; height: 100%;">
+                                    <img id="profileImgView" src="<%= previewImg %>" alt="Profile Image Preview">
+                                </div>
+                                <span role="button" id="uploadIconWrapper">
+                                    <i class="fas fa-camera"></i>
+                                    <input type="file" id="profileImg" name="profileImg" accept="image/png, image/jpg, image/jpeg">
+                                </span>
+                                 <button type="button" id="removeImageBtn" class="removeImageBtn"style="display: <%= displayStyle %>">×</button>
+                            </label>
+                           
+                        </div>
+                        <input type="hidden" id="profileOldImg" name="profileOldImg" value="<%= profileImage %>">
+                        <input type="hidden" name="removeImage" id="removeImage" value="0">
+                        <div id="errorContainer"></div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include("../common/footer") %>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fileInput = document.getElementById('profileImg');
+        const profileImgView = document.getElementById('profileImgView');
+        const removeBtn = document.getElementById('removeImageBtn');
+        const errorContainer = document.getElementById('errorContainer');
+        const profileOldImg = document.getElementById('profileOldImg');
+        const uploadIconWrapper = document.getElementById('uploadIconWrapper');
+        const removeImage = document.getElementById('removeImage');
+
+        // Show preview and remove button
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            errorContainer.innerHTML = '';
+
+            if (file) {
+                const fileType = file.name.split('.').pop().toLowerCase();
+                if (['jpg', 'jpeg', 'png'].includes(fileType)) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        profileImgView.src = reader.result;
+                        profileImgView.style.display = 'block';
+                        profileImgView.style.height = '100%';
+                        removeBtn.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    removeBtn.style.display = 'none';
+                    const errorMsg = document.createElement('p');
+                    errorMsg.style.color = 'red';
+                    errorMsg.textContent = '<%= __("Please upload a valid image file (JPG, JPEG, or PNG).") %>';
+                    errorContainer.appendChild(errorMsg);
+                    // e.target.value = '';
+                }
+            }
+        });
+
+        // Remove image preview
+        removeBtn.addEventListener('click', () => {
+            profileImgView.src = '<%= base_url %>assets/images/placeholder.jpg';
+            profileImgView.style = '';
+            removeBtn.style.display = 'none';
+            uploadIconWrapper.style.display = 'block';
+            fileInput.value = '';
+            removeImage.value = '1';
+
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+        $('.country, #state, .city, .multiSelect').select2();
+        //number validation
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+        // for two factor input code
+        $('input[name="token"]').on('input keydown', function (e) {
+            if (e.type === 'input' && this.value) $(this).next().focus();
+            else if (e.key === 'Backspace' && !this.value) $(this).prev().focus();
+        });
+
+        // get state
+        $(document).on('change', '.country', function () {
+            $.post(`<%= base_url + get_state %>`, { country: $(this).val() }).done(res =>
+                $('#state').html(res.state?.map(({ id, name }) =>`<option value="${id}">${name}</option>`).join('') || '').val(`<%= metaData.find(item => item.meta_key == 'state')?.meta_value %>`).trigger('change'));
+        });
+        $('.country').val(`<%= metaData.find(item => item.meta_key == 'country')?.meta_value || '' %>`).trigger('change');
+
+        // get city
+        $(document).on('change', '.state', function () {
+            $.post(`<%= base_url + get_city %>`, { state: $(this).val() }).done(res =>
+                $('#city').html(res.city?.map(({ id, name }) => `<option value="${id}">${name}</option>`).join('') || '')
+                    .val(`<%= metaData.find(item => item.meta_key == 'city')?.meta_value || '' %>`).trigger('change'));
+        });
+        $('.state').val(`<%= metaData.find(item => item.meta_key == 'state')?.meta_value || '' %>`).trigger('change');
+      
+
+        const secretKey = `<%= data.twoFactor_key %>`;
+            const toggleTwoFactor = () => {
+            const show = $('#twoFactorStatus').val() === '1';
+            $('.showQrcode, .twofactorCode').toggleClass('d-none', !show);
+        };
+        toggleTwoFactor();
+        $('#twoFactorStatus').on('change', toggleTwoFactor);
+        
+
+        // error remove when key text and change select
+        $('#profile').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+
+        $('#profile').submit(function (e) {
+            e.preventDefault();
+            $('#loader').show();
+            const file = $('#profileImg')[0].files[0];
+            const validFormats = ['image/png', 'image/jpg', 'image/jpeg'];
+            if (file && !validFormats.includes(file.type)) {
+                $('#loader').hide();
+                showMsg(`<%= __("Please upload a valid image file (JPG, JPEG, or PNG).") %>`, 'danger');
+                return;
+            }
+            let formData = new FormData($('#profile')[0]);
+            const status = $('#twoFactorStatus').val();
+            if (status === '1' && !secretKey) {
+                const token = $('input[name="token"]').map((_, i) => i.value).get().join('');
+                if (token.length !== 6) {
+                    showMsg(`<%= __("Please fill in all token fields") %>`, 'danger');
+                    return;
+                }
+                formData.append('twoFactorKey', $('#twoFactorStatus').data('key'));
+            }
+            let phoneNumber = $('#phoneNumber').val().trim();
+            const phoneRegex = /^[6-9]\d{9}$/;
+
+            if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+                $('#loader').hide();
+                 $('html, body').animate({ scrollTop: 0 }, 'fast');
+                $('#phoneNumberError').text('<%=__("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9 (e.g., 9876543210)")%>');
+                return;
+            }
+            $('#phoneNumberError').text('');
+            $.post({ url: $(this).attr('action'), data: formData, cache: false, contentType: false, processData: false })
+                .done(res => {
+                    if (res.errors) {
+                        $('html, body').animate({ scrollTop: 0 }, 'fast');
+                        Object.keys(res.errors).forEach(field => $(`#${field}Error`).text(res.errors[field]))
+                    } else {
+                        showMsg(res.success || res.error, res.success ? "success" : "danger");
+                        if (res.success) setTimeout(() => location.reload(), 1500);
+                    }
+                }).fail(err => { showMsg(`<%=__("Something went wrong. Please try again.") %>`, "danger"); });;
+        });
+
+        // msg show
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+    });
+</script>
