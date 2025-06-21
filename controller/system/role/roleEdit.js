@@ -24,6 +24,7 @@ const editRole = async (req, res) => {
             menusList,
             roleData,
             update_role: rolePath.ROLE_UPDATE_ACTION + req.params.id,
+            role_list: rolePath.ROLE_LIST_VIEW
 
         })
     } catch (error) {

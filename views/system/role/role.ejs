@@ -138,7 +138,7 @@
                     Object.keys(res.errors).forEach(field => $(`#${field}Error`).text(res.errors[field]));
                 } else {
                     showMsg(res.success || res.error, res.success ? "success" : "danger");
-                    if (res.success) setTimeout(() => location.reload(), 1500);
+                    if (res.success) setTimeout(() => window.location.href = `<%= base_url + role_list %>`, 1500);
                 }
             });
         });

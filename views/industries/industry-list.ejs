@@ -1,0 +1,194 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+<div class="card-body d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <select id="bulk-action" class="form-select d-inline-block" style="width: 180px;">
+            <option value=""><%=__("SELECT_ACT") %></option>
+            <option value="1"><%=__("ENABLE_SLT")%></option>
+            <option value="0"><%=__("DISABLE_SLT") %></option>
+            <% if(dltPermission) { %>
+            <option value="2"><%=__("DELETE_SLT") %></option>
+            <% } %>
+        </select>
+        <% if(updatePermission) { %>
+        <button id="apply-bulk-action" class="btn btn-primary ms-2 bulk_action"><%=__("APPLY") %></button>
+        <% } %>
+    </div>
+    <% if(addPermission) { %>
+        <div class="">
+            <button class="btn btn-primary addIndustry" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"> <%=__("INDUSTRY_ADD") %></button>
+        </div>
+    <% } %>   
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="industryTable" class="table table-bordered dt-responsive  nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="chkAll" /></th>
+                            <th>
+                                <%=__("INDUSTRY_ID") %>
+                            </th>
+                            <th>
+                                <%=__("NAME") %>
+                            </th>
+                            <th>
+                                <%=__("CATEGORIES") %>
+                            </th>
+                            <th>
+                                <%=__("STATUS") %>
+                            </th>
+                            <th>
+                                <%=__("ACTION") %>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" aria-modal="false" role="dialog">
+    <div class="offcanvas-header">
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="px-4 py-4">
+        <div class="loader"></div>
+        <% if(addPermission || updatePermission) { %>
+        <form action="<%= base_url + industry_add_url %>" id="indusrtyAdd">
+        <% } %>  
+            <div class="mb-3 auth-form-wrapper">
+                <label class="form-label required_field"><%=__("NAME") %><span class="text-danger"><%=__("*") %></span></label>
+                <input type="text" class="form-control" id="industry" name="industry" placeholder="<%=__("INDUSTRY_NAME") %>">
+                <span id="industryError" class="text-danger errorRemove"></span>
+            </div>
+           
+            <div class="mb-3 auth-form-wrapper">
+                <label class="form-label required_field"><%=__("STATUS") %><span class="text-danger"><%=__("*") %></span></label>
+                <select class="form-select" id="industryStatus" name="status">
+                    <option value="1"><%=__("Enable") %></option>
+                    <option value="0"><%=__("Disable") %></option>
+                </select>
+                <span id="statusError" class="text-danger errorRemove"></span>
+            </div>
+            <% if(addPermission || updatePermission) { %>
+            <button class="btn btn-primary submit_btn" type="submit"><%=__("SUBMIT") %></button>
+            <% } %>
+        </form>
+    </div>
+</div>
+
+<%- include('../../common/footer') %>
+<script>
+var dataTable;
+$(document).ready(function () {
+    setTimeout(() => $('#loader').hide(), 300);
+    let lngFile = JSON.parse(`<%- langData %>`);
+    let dataTable = $('#industryTable').DataTable({
+        processing: true,
+        serverSide: true,
+        serverMethod: 'post',
+        ajax: { url: `<%= base_url + industry_dataTable_url %>` },
+        language: lngFile,
+        columns: [
+            { data: null, orderable: false, defaultContent: '', className: 'select-checkbox' },
+            { data: 'id', orderable: false },
+            { data: 'name' },
+            { data: 'categories', orderable: false },
+            { data: 'status' },
+            { data: 'action', orderable: false },
+        ],
+        columnDefs: [{
+            targets: 0,
+            orderable: false,
+            className: 'select-checkbox',
+            render: () => '<input type="checkbox" class="row-select">'
+        }],
+        select: { style: 'os', selector: 'td:first-child' },
+        order: [[0, 'ASC']],
+        lengthMenu: [10, 20, 50, 100, 200],
+        searching: true,
+        lengthChange: false,
+    });
+
+    $('#chkAll').on('click', function () {
+        $('input.row-select', dataTable.rows({ search: 'applied' }).nodes()).prop('checked', this.checked);
+    });
+
+    // error remove when key text and change select
+    $('#indusrtyAdd').on('input change', 'input, select', function() {
+        $(this).next('.errorRemove').text('');
+    });
+
+    // when click add industry than form reset
+    $(document).on('click', '.addIndustry, .editIndustry', () => { $('.loader').hide(); $('.errorRemove').text(''); });
+    $('.addIndustry').click(() => ($('#indusrtyAdd')[0].reset(), $('#indusrtyAdd').attr('action', `<%= base_url + industry_add_url %>`)));
+    
+
+    // industry form submit
+    $('#indusrtyAdd').submit(function (e) {
+        e.preventDefault();
+        $('.loader').show();
+        $.post($(this).attr('action'), $(this).serialize()).done(res => {
+            $('.loader').hide();
+            if (res.errors) {
+                Object.keys(res.errors).forEach(field => $(`#${field}Error`).text(res.errors[field]));
+            } else {
+                showMsg(res.success || res.error, res.success ? "success" : "danger");
+                if (res.success) setTimeout(() =>  $('#indusrtyAdd')[0].reset(), $('.btn-close').click(), $('.loader').hide(), dataTable.draw(), 1500);
+            }
+        });
+    });
+
+    // Function to show messages
+    function showMsg(msg, type = "danger") {
+        const toast = $('.toast-container');
+        toast.toggleClass('d-none', !msg).find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+        setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        $('.loader').hide();
+    }
+
+        // edit industry
+    $(document).on('click', '.editIndustry', function () {
+        $.post(`<%= base_url + industry_edit_url %>`, { id: $(this).attr('row-id') }).done(res => {
+            if (res.result) $('#industry').val(res.result.name), 
+            $('#industryStatus').val(res.result.status).change(), 
+            $('#indusrtyAdd').attr('action', `<%= base_url %>${res.update_url}`);
+        });
+    });
+
+    $(document).on('click', '.bulk_action', function() {
+        let selectedIds = dataTable.$('input.row-select:checked').map(function() {
+            return dataTable.row($(this).closest('tr')).data().id;
+        }).get();
+
+        if (!selectedIds.length) return showMsg(`<%=__("CHECKBOX_ACT_ERROR")%>`, "danger");
+
+        let actionValue = $('#bulk-action').val();
+        if (!actionValue) return showMsg(`<%=__("SELECT_ACT_ERROR")%>`, "danger");
+
+        Swal.fire({
+            title: lngFile.COMM_TITLE,
+            text: lngFile.BULK_ACTION,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: lngFile.CONFIRMBTN_PROCEED,
+            cancelButtonText: lngFile.CONFIRMBTN_CANCEL,
+            customClass: { confirmButton: "btn btn-success", cancelButton: "btn btn-danger me-2" },
+            buttonsStyling: false,
+            reverseButtons: true
+        }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+                $.post({url: `<%= base_url + industry_bulk_act_url %>`, data: { actionVal: actionValue, indIds: selectedIds }}).done(res => {
+                    Swal.fire(res.success ? lngFile.PROCEED_TEXT : lngFile.CANCEL_TEXT, res.success || res.error, res.success ? "success" : "error");
+                    if (res.success) dataTable.draw(); $('#chkAll').prop('checked', false)
+                });
+            }
+        });
+    });
+
+});   
+</script>

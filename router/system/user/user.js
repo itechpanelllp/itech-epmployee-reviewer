@@ -10,22 +10,22 @@ const path = require('./userPath');
 
 
 // user list
-app.get(`/${path.USER_LIST_VIEW}`, checkSession, checkPermission('system-users','view'), userController.userList);
+app.get(`/${path.USER_LIST_VIEW}`, checkSession, checkPermission('users','view'), userController.userList);
 
 // user datatable
-app.post(`/${path.USER_DATATABLE_ACTION}`, checkSession,  checkPermission('system-users','view'), userController.userDataTable);
+app.post(`/${path.USER_DATATABLE_ACTION}`, checkSession,  checkPermission('users','view'), userController.userDataTable);
 
 // user status update
-app.post(`/${path.USER_STATUS_UPDATE_ACTION}`, checkSession,  checkPermission('system-users','update'), userController.updateUserStatus);
+app.post(`/${path.USER_STATUS_UPDATE_ACTION}`, checkSession,  checkPermission('users','update'), userController.updateUserStatus);
 
 // user add
-app.post(`/${path.USER_ADD_ACTION}`, checkSession,  checkPermission('system-users','add'), userField, addUserController.addUser);
+app.post(`/${path.USER_ADD_ACTION}`, checkSession,  checkPermission('users','add'), userField, addUserController.addUser);
 
 // user edit
-app.get(`/${path.USER_EDIT_VIEW}:id`, checkSession,  checkPermission('system-users','view'), editUserController.editUserView);
+app.get(`/${path.USER_EDIT_VIEW}:id`, checkSession,  checkPermission('users','view'), editUserController.editUserView);
 
 // user update
-app.post(`/${path.USER_UPDATE_ACTION}:id`, checkSession,  checkPermission('system-users','update'), userUpdateField, editUserController.updateUser);
+app.post(`/${path.USER_UPDATE_ACTION}:id`, checkSession,  checkPermission('users','update'), userUpdateField, editUserController.updateUser);
 
 // get state
 app.post(`/${path.USER_STATE_ACTION}`, checkSession, editUserController.getState);
@@ -33,15 +33,15 @@ app.post(`/${path.USER_STATE_ACTION}`, checkSession, editUserController.getState
 app.post(`/${path.USER_CITY_ACTION}`, checkSession, editUserController.getCity);
 
 // user delete
-app.post(`/${path.USER_DELETE_ACTION}:id`, checkSession,  checkPermission('system-users','delete'), userController.deleteUser);
+app.post(`/${path.USER_DELETE_ACTION}:id`, checkSession,  checkPermission('users','delete'), userController.deleteUser);
 
 // user trash
-app.post(`/${path.TRASH_USER_ACTION}`, checkSession, checkPermission('system-users','view'), userController.showTrashUser);
+app.post(`/${path.TRASH_USER_ACTION}`, checkSession, checkPermission('users','view'), userController.showTrashUser);
 
 // user permanent delete
-app.post(`/${path.USER_PERMANENT_ACTION_URL}:id`, checkSession, checkPermission('system-users','delete'), userController.permanentUserDelete);
+app.post(`/${path.USER_PERMANENT_ACTION_URL}:id`, checkSession, checkPermission('users','delete'), userController.permanentUserDelete);
 // user restore
-app.post(`/${path.USER_RESTORE_ACTION_URL}:id`, checkSession,  checkPermission('system-users','update'), userController.restoreUser);
+app.post(`/${path.USER_RESTORE_ACTION_URL}:id`, checkSession,  checkPermission('users','update'), userController.restoreUser);
 
 
 

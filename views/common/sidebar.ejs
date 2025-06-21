@@ -1,36 +1,41 @@
   <!-- ========== Left Sidebar Start ========== -->
-            <div class="vertical-menu">
-
-                <div data-simplebar class="h-100">
-
-                    <!--- Sidemenu -->
-                    <div id="sidebar-menu">
-                        <!-- Left Menu Start -->
-                        <ul class="metismenu list-unstyled" id="side-menu">
-                           
-
-                            <li>
-                                <a href="javascript: void(0);" >
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-dashboards"><%=__("Dashboard") %></span>
-                                </a>
-                             
-                            </li>
-                            <li>
-                                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                    <i class="bx bx-home-circle"></i>
-                                    <span key="t-dashboards"><%=__("System") %></span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li><a href="<%= base_url %>role/list" key="t-default"><%=__("Role") %></a></li>
-                                    <li><a href="<%= base_url %>user/list" key="t-saas"><%=__("User") %></a></li>
-                                   
-                                </ul>
-                            </li>
-                  
-                        </ul>
-                    </div>
-                    <!-- Sidebar -->
-                </div>
-            </div>
-            <!-- Left Sidebar End -->
+<div class="vertical-menu">
+    <div data-simplebar class="h-100">
+        <div id="sidebar-menu">
+            <ul class="metismenu list-unstyled" id="side-menu">
+                <li>
+                    <a href="javascript: void(0);" >
+                        <i class="bx bx-home-circle"></i>
+                        <span key="t-dashboards"><%=__("Dashboard") %></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<%= base_url %>industry/list" class="waves-effect" aria-expanded="false">
+                        <i class="bx bx-building-house"></i>
+                        <span key="t-dashboards"><%=__("Industry") %></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-shield-quarter"></i>
+                        <span key="t-dashboards"><%=__("System") %></span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="<%= base_url %>role/list" key="t-default"><%=__("Role") %></a></li>
+                        <li><a href="<%= base_url %>user/list" key="t-saas"><%=__("User") %></a></li>
+                        
+                    </ul>
+                </li>
+                <li>
+                    <a href="<%= base_url %>site/setting" >
+                        <i class="bx bx-cog"></i>
+                        <span key="t-dashboards"><%=__("Site Setting") %></span>
+                    </a>
+                </li>
+        
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->

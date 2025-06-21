@@ -12,10 +12,10 @@ const addRole = async (req, res) => {
 
         const toNested = (items, parentId = 0) => items.filter(item => item.parent === parentId)
             .map(item => {
-                const trimmedName = item.name?.trim(); 
+                const trimmedName = item.name?.trim();
                 return {
                     ...item,
-                    name:  langData[trimmedName] || trimmedName, 
+                    name: langData[trimmedName] || trimmedName,
                     children: toNested(items, item.id),
                 };
             });
@@ -28,6 +28,7 @@ const addRole = async (req, res) => {
             menusList,
             roleData: '',
             add_role: rolePath.ROLE_ADD_ACTION,
+            role_list: rolePath.ROLE_LIST_VIEW
         })
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -38,7 +39,7 @@ const addRole = async (req, res) => {
 const addRoleAction = async (req, res) => {
     try {
         const { roleName, roleStatus, permissions } = req.body;
-        
+
         // Check if the role name already exists
         const existingRole = await roleModel.getRoleByName(roleName);
         if (existingRole) return res.status(200).json({ error: res.__('Role name already exists') });

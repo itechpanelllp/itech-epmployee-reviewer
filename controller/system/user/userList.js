@@ -9,7 +9,7 @@ const { checkPermissionEJS } = require('@middleware/checkPermission');
 const userList = async (req, res) => {
     try {
         const role = await userModel.getRole();
-        const addUserPer = await checkPermissionEJS('system-users', 'add', req);
+        const addUserPer = await checkPermissionEJS('users', 'add', req);
         res.render('system/user/userList', {
             title: res.__("User-list"),
             session: req.session,
@@ -46,8 +46,8 @@ const userDataTable = async (req, res) => {
         const totalRecords = records?.[0]?.total || 0;
 
         // check permission
-        const dltUserPer = await checkPermissionEJS('system-users', 'delete', req);
-        const updateUserPer = await checkPermissionEJS('system-users', 'update', req);
+        const dltUserPer = await checkPermissionEJS('users', 'delete', req);
+        const updateUserPer = await checkPermissionEJS('users', 'update', req);
 
         const dataArr = records.map((row) => {
             var status = updateUserPer ? `<div class="form-check form-switch form-switch-lg" dir="ltr"><input type="checkbox" class="form-check-input user_status" data-status = ${row.status} row-id = ${row.id} id="usertatus" ${row.status == 1 ? "checked" : ""} ><label class="form-check-label" for="usertatus"></label></div>` : row.status == 1 ? res.__("Active") : res.__("Inactive");
@@ -122,8 +122,8 @@ const showTrashUser = async (req, res) => {
         trashUsers = JSON.parse(JSON.stringify(trashUsers, (_, value) => (typeof value === "bigint" ? value.toString() : value)));
         const totalRecords = trashUsers?.[0]?.total || 0;
         // check permisision
-        const updateUserPer = await checkPermissionEJS('system-users', 'update', req);
-        const dltUserPer = await checkPermissionEJS('system-users', 'delete', req);
+        const updateUserPer = await checkPermissionEJS('users', 'update', req);
+        const dltUserPer = await checkPermissionEJS('users', 'delete', req);
         const dataArr = trashUsers.map((row) => {
             var restoreBtn = updateUserPer ? `<button type="button" class="border-0 bg-transparent userRestore"  data-url = "${userPath.USER_RESTORE_ACTION_URL}" data-id="${row.id}" ><i class="font-size-18 fas fa-trash-restore" style="color:#d73328"></i></button>`: '-';
             var deleteBtn =  dltUserPer ? `<button type="button" class="border-0 bg-transparent userPerDelete" data-url = "${userPath.USER_PERMANENT_ACTION_URL}" data-id="${row.id}"><i class="font-size-18 fas fa-trash" style="color:#d73328"></i></button>`: '-';

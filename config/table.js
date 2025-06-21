@@ -7,7 +7,8 @@ module.exports = {
     country: 'country',
     state: 'state',
     city: 'city',
-    permission_menus: 'permission_menus',
+    sidebar_menus: 'sidebar_menus',
+    configuration: 'configuration',
    
 
 

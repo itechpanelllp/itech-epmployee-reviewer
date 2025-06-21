@@ -5,7 +5,7 @@ const db = require('@config/db');
 module.exports = {
    //role permissions
    getRolePermissionsMenus: async () => {
-      const result = await db.query(`SELECT id, name, code, parent, url FROM ${roleTables.permission_menus} WHERE status = '1'`);
+      const result = await db.query(`SELECT id, name, code, parent, url FROM ${roleTables.sidebar_menus} WHERE status = '1'`);
       return result || '';
    },
 

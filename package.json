@@ -57,6 +57,9 @@
     "@ProfileRouter": "router/profile",
     "@twoFactorController": "controller/auth/twoFactor",
     "@twoFactorModel": "models/auth/twoFactor",
-    "@twoFactorRouter": "router/auth/twoFactor"
+    "@twoFactorRouter": "router/auth/twoFactor",
+    "@settingController":"controller/setting",
+    "@settingModel":"models/setting",
+    "@settingRouter":"router/setting"
   }
 }

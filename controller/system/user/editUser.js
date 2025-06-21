@@ -12,7 +12,7 @@ const editUserView = async (req, res) => {
         const metaData = await userModel.userMeta(userId);
         const role = await userModel.getRole();
         const country = await userModel.getCountry();
-        const updateUserPer = await checkPermissionEJS('system-users', 'update', req);
+        const updateUserPer = await checkPermissionEJS('users', 'update', req);
         if (!user) {
             return res.redirect(`/${userPath.USER_LIST_VIEW}`);
         }

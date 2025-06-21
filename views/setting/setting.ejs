@@ -1,0 +1,236 @@
+<%- include('../common/header', title) %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="tab-content text-muted mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form action="<%= base_url + add_url %>" id="settingUpdate">
+                        <div class="row">
+                            <!-- name -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-text-input" class="form-label required_field"><%=__("Name") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input class="form-control" type="text" id="name" name="setting[name]"
+                                    placeholder="<%=__("Name") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'name')?.meta_value || '' %>">
+                                <span id="setting.nameError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- business Name -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-text-input"
+                                    class="form-label required_field"><%=__("Business Name") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input class="form-control" type="text" id="businessName" name="setting[businessName]"
+                                    placeholder="<%=__("Business Name") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'businessName')?.meta_value || '' %>">
+                                <span id="setting.businessNameError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- email -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-text-input" class="form-label required_field"><%=__("Email") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input class="form-control" type="text" id="email" name="setting[email]"
+                                    placeholder="<%=__("Email") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'email')?.meta_value || '' %>" />
+                                <span id="setting.emailError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- phoneNumber -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Phone Number") %></label>
+                                <input type="text" class="form-control number_validation" id="phoneNumber"
+                                    name="setting[phoneNumber]" placeholder="<%=__("Phone Number") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'phoneNumber')?.meta_value || '' %>">
+                                <span id="setting.phoneNumberError" class="text-danger errorRemove phoneNumberError"></span>
+
+                            </div>
+                            <!-- country -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="choices-single-default"
+                                    class="form-label required_field"><%=__("Country") %></span></label>
+                                <select name="setting[country]" id="choices-single-default" class="form-select country">
+                                    <option value><%=__("Select Country") %></option>
+                                    <% country.forEach( item => { %>
+                                    <option value="<%= item.id %>"><%= item.name %></option>
+                                    <% }) %>
+                                </select>
+                                <span id="setting.countryError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- state -->
+                            <div class="mb-3 col-lg-6">
+                                <label class="form-label required_field"><%=__("State") %></label>
+                                <select class="form-select state" id="state" name="setting[state]"
+                                    data-placeholder="<%=__("Select state") %>">
+                                    <option value><%=__("Select State") %></option>
+
+                                </select>
+                                <span id="setting.stateError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- city -->
+                            <div class="mb-3 col-lg-6">
+                                <label class="form-label required_field"><%=__("City") %></label>
+                                <select class="form-select city" id="city" name="setting[city]"
+                                    data-placeholder="<%=__("Select city") %>">
+                                    <option value><%=__("Select City") %></option>
+
+                                </select>
+                                <span id="setting.cityError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- address -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Address") %></label>
+                                <input type="text" class="form-control" id="address" name="setting[address]"
+                                    placeholder="<%=__("Address") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'address')?.meta_value || '' %>">
+                                <span id="setting.addressError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- postal code -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Postal Code") %></label>
+                                <input type="text" class="form-control" id="postal_code" name="setting[postal_code]"
+                                    placeholder="<%=__("Postal Code") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'postal_code')?.meta_value || '' %>">
+                                <span id="setting.postal_codeError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- invoice prefix -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Invoice Prefix") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control" id="invoice_prefix"
+                                    name="setting[invoice_prefix]" placeholder="<%=__("Invoice Prefix") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'invoice_prefix')?.meta_value || '' %>">
+                                <span id="setting.invoice_prefixError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- company gst -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Company GST") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control" id="company_gst" name="setting[company_gst]"
+                                    placeholder="<%=__("Company GST") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'company_gst')?.meta_value || '' %>">
+                                <span id="setting.company_gstError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- tax name -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Tax Name") %></label>
+                                <input type="text" class="form-control" id="tax_name" name="setting[tax_name]"
+                                    placeholder="<%=__("Tax Name") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'tax_name')?.meta_value || '' %>">
+                                <span id="setting.tax_nameError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- tax rate -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Tax Rate") %></label>
+                                <input type="text" class="form-control" id="tax_rate" name="setting[tax_rate]"
+                                    placeholder="<%=__("Tax Rate") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'tax_rate')?.meta_value || '' %>">
+                                <span id="setting.tax_rateError" class="text-danger errorRemove"></span>
+                            </div>
+
+                            <!-- meta_title -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Meta Title") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control" id="meta_title" name="setting[meta_title]"
+                                    placeholder="<%=__("Meta Title") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'meta_title')?.meta_value || '' %>">
+                                <span id="setting.meta_titleError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- meta_description -->
+                            <div class="mb-3 col-lg-6">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Meta Description") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control" id="meta_description"
+                                    name="setting[meta_description]" placeholder="<%=__("Meta Description") %>"
+                                    value="<%= siteData.find( item => item.meta_key == 'meta_description')?.meta_value || '' %>">
+                                <span id="setting.meta_descriptionError" class="text-danger errorRemove"></span>
+                            </div>
+
+                        </div>
+                        <button class="btn btn-primary float-end" type="submit"><%=__("Submit") %></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<%- include('../common/footer') %>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+        $('.country, #state, .city').select2({ placeholder: function () { return $(this).data('placeholder'); }, sorter: s => s.sort((a, b) => a.text.localeCompare(b.text)) });
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                document.querySelector('.select2-container--open .select2-search__field')?.focus();
+            }, 0);
+        })
+
+        //number validation      
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+        // get state
+        $(document).on('change', '.country', function () {
+            $.post(`<%= base_url + state_get_url %>`, { country: $(this).val() }).done(res =>
+                $('#state').html(res.state?.map(({ id, name }) => `<option value="${id}">${name}</option>`).join('') || '')
+                    .val(`<%= siteData.find(item => item.meta_key == 'state')?.meta_value %>`).trigger('change'));
+        });
+        $('.country').val(`<%= siteData.find(item => item.meta_key == 'country')?.meta_value %>`).trigger('change');
+
+        // get city
+        $(document).on('change', '.state', function () {
+            $.post(`<%= base_url + city_get_url %>`, { state: $(this).val() }).done(res =>
+                $('#city').html(res.city?.map(({ id, name }) => `<option value="${id}">${name}</option>`).join('') || '')
+                    .val(`<%= siteData.find(item => item.meta_key == 'city')?.meta_value %>`).trigger('change'));
+        });
+        $('.state').val(`<%= siteData.find(item => item.meta_key == 'state')?.meta_value %>`).trigger('change');
+
+        // error remove when key text and change select
+        $('#settingUpdate').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+
+        // form submit
+        $('#settingUpdate').submit(function (e) {
+            e.preventDefault();
+            let phoneNumber = $('#phoneNumber').val().trim();
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+                $('#loader').hide();
+                $('html, body').animate({ scrollTop: 0 }, 'fast');
+                $('.phoneNumberError').text("<%=__('Please enter 10 digit phone number example-9876543210')%>");
+                return;
+            }
+            $('.phoneNumberError').text('');
+            $.post({ url: $(this).attr('action'), data: $(this).serialize() })
+                .done(res => {
+                    $('#loader').hide();
+                    if (res.errors) {
+                        $('html, body').animate({ scrollTop: 0 }, 'fast');
+                        Object.keys(res.errors).forEach(field => $(`#${field.replace(/\./g, '\\.')}Error`).text(res.errors[field]))
+                    } else {
+                        showMsg(res.success || res.error, res.success ? "success" : "danger");
+                        if (res.success) setTimeout(() => location.reload(), 1500);
+                    }
+                });
+        })
+
+        // msg show
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+
+    })    
+</script>
