@@ -10,6 +10,8 @@ router.use('/', require('./system/user/user'));
 router.use('/', require('./system/role/role'));
 router.use('/', require('./profile/profile'));
 router.use('/', require('./setting/setting'));
+router.use('/', require('./industries/industries'));
+router.use('/', require('./companies/companies'));
 
 
 

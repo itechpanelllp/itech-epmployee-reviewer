@@ -11,8 +11,8 @@ module.exports = {
     USER_UPDATE_ACTION: 'user/update/',
     USER_DELETE_ACTION: 'user/delete/',
 
-    USER_CITY_ACTION: 'user/city',
-    USER_STATE_ACTION: 'user/state',
+    USER_CITY_ACTION: 'city',
+    USER_STATE_ACTION: 'state',
     
     TRASH_USER_ACTION: 'user/trash',
     USER_PERMANENT_ACTION_URL: 'user/permanent/delete/',

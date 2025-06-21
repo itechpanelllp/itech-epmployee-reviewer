@@ -1,10 +1,9 @@
-const express = require('express');
-const app = express.Router();
-const { userActivityLog } = require('@middleware/commonMiddleware');
-const industryPath = require('@industryRouter/industriesPath');
+
+const { userActivityLog, slug } = require('@middleware/commonMiddleware');
+const industryPath = require('@industryRouter/industryPath');
 const industryModel = require('@industryModel/industries');
-const { checkPermissionEJS } = require('@middleware/permissionCheck');
-const { slug } = require('@middleware/common_middleware');
+const { checkPermissionEJS } = require('@middleware/checkPermission');
+const slugify = require('slugify');
 
 // show industry list
 const industryList = async (req, res) => {
@@ -12,7 +11,7 @@ const industryList = async (req, res) => {
         const addPermission = await checkPermissionEJS('industry', 'add', req);
         const updatePermission = await checkPermissionEJS('industry', 'update', req);
         const dltPermission = await checkPermissionEJS('industry', 'delete', req);
-       
+
         res.render('industries/industry-list', {
             title: res.__("Industries-list"),
             session: req.session,
@@ -23,7 +22,7 @@ const industryList = async (req, res) => {
             industry_add_url: industryPath.INDUSTRY_ADD_ACTION_URL,
             industry_status_url: industryPath.INDUSTRY_STATUS_UPDATE_URL,
             industry_edit_url: industryPath.INDUSTRY_EDIT_ACTION_URL,
-            industry_bulk_act_url: industryPath.INDUSTRY_BULK_ACTION_URL,
+            industry_delete_url: industryPath.INDUSTRY_DELETE_ACTION_URL,
         })
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -33,51 +32,50 @@ const industryList = async (req, res) => {
 // show industry dataTable
 const industryDataTable = async (req, res) => {
     try {
-    const { draw = 1, search, start = 0, length: limit = 10, order = [{ column: 0, dir: "DESC" }], columns } = req.body;
-    const term = search?.value || "";
-    const columnIndex = order[0]?.column || 0;
-    const sort = columns[columnIndex]?.data || "id";
-    const sortOrder = order[0]?.dir || "DESC";
-    const where = term ? `1=1 AND (ci.id LIKE '%${term}%' OR cim.name LIKE '%${term}%' OR cim.status LIKE '%${term}%')` : `1=1`;
+        const { draw = 1, search, start = 0, length: limit = 10, order = [{ column: 0, dir: "DESC" }], columns } = req.body;
+        const term = search?.value || "";
+        const columnIndex = order[0]?.column || 0;
+        const sort = columns[columnIndex]?.data || "id";
+        const sortOrder = order[0]?.dir || "DESC";
+        const where = term ? `1=1 AND (i.id LIKE '%${term}%' OR info.name LIKE '%${term}%' OR i.status LIKE '%${term}%')` : `1=1`;
 
-    var records = await industryModel.industryDataTable(where, start, limit, sort, sortOrder);
+        var records = await industryModel.industryDataTable(where, start, limit, sort, sortOrder);
 
-    records = JSON.parse(JSON.stringify(records, (_, value) => (typeof value === "bigint" ? value.toString() : value)));
-    var total_records = records != '' ? records[0].total : 0;
+        records = JSON.parse(JSON.stringify(records, (_, value) => (typeof value === "bigint" ? value.toString() : value)));
+        var total_records = records != '' ? records[0].total : 0;
 
-    // check permission
-    const updatePer = await checkPermissionEJS('industries', 'update', req);
-    const deletePer = await checkPermissionEJS('industries', 'delete', req);
-    var data_arr = [];
-    if (records.length > 0) {
-        for (i = 0; i < records.length; i++) {
-            var row = records[i];
+        // check permission
+        const updatePer = await checkPermissionEJS('industry', 'update', req);
+        const deletePer = await checkPermissionEJS('industry', 'delete', req);
+        var data_arr = [];
+        if (records.length > 0) {
+            for (i = 0; i < records.length; i++) {
+                var row = records[i];
 
-            var status = updatePer ? `<div class="form-check form-switch form-switch-lg" dir="ltr"><input type="checkbox" class="form-check-input industries-status" data-status = ${row.status} row-id = ${row.id} id="industry-status" ${row.status == 1 ? 'checked' : ''} ><label class="form-check-label" for="industries-status"></label></div>` : row.status == 1 ? res.__("ACTIVE") : res.__("INACTIVE")
+                var status = updatePer ? `<div class="form-check form-switch form-switch-lg" dir="ltr"><input type="checkbox" class="form-check-input industries-status" data-status = ${row.status} row-id = ${row.id} id="industry-status" ${row.status == 'active' ? 'checked' : ''} ><label class="form-check-label" for="industries-status"></label></div>` : row.status == 'active' ? res.__("ACTIVE") : res.__("INACTIVE")
 
-            var editBtn = updatePer ? `<button type="button" class="border-0 bg-transparent editIndustry" row-id = ${row.industryId} data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" style="color: #5156be !important;"><i class="font-size-18 fas fa-edit"></i></button>`: '-';
+                var editBtn = updatePer ? `<button type="button" class="border-0 bg-transparent editIndustry" row-id = ${row.id} data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" style="color: #5156be !important;"><i class="font-size-18 fas fa-edit"></i></button>` : '-';
 
-            // var deleteBtn = deletePer ? `<button type="button" class="delete_industries border-0 bg-transparent deleteIndustry" data-url = ${industryPath.INDUSTRY_DELETE_ACTION_URL} data-id = ${row.id}><i class="font-size-18 fas fa-trash" style="color:#d73328"></i></button>` : '';
+                var deleteBtn = deletePer ? `<button type="button" class="delete_industries border-0 bg-transparent deleteIndustry" data-url = ${industryPath.INDUSTRY_DELETE_ACTION_URL} data-id = ${row.id}><i class="font-size-18 fas fa-trash" style="color:#d73328"></i></button>` : '';
 
-            var actionBtn = `${editBtn}`;
-            data_arr.push({
-                id: row.industryId,
-                name: row.name,
-                categories: row.category_count,
-                status: `<span class="badge rounded-pill ${row.status == 1 ? 'bg-success' : 'bg-danger'}">${row.status == 1 ? 'Enable' : 'Disable'}</span>`,
-                action: `<div class="d-flex items-center gap-3 cursor-pointer">${actionBtn || '-'}</div>`,
-            });
+                var actionBtn = `${editBtn}${deleteBtn}`;
+                data_arr.push({
+                    id: row.id,
+                    name: row.name,
+                    status: status,
+                    action: `<div class="d-flex items-center gap-3 cursor-pointer">${actionBtn || '-'}</div>`,
+                });
+            }
         }
-    }
 
-    var data = {
-        'draw': draw,
-        'recordsTotal': total_records,
-        'recordsFiltered': total_records,
-        'data': data_arr
-    };
+        var data = {
+            'draw': draw,
+            'recordsTotal': total_records,
+            'recordsFiltered': total_records,
+            'data': data_arr
+        };
 
-    res.json(data);
+        res.json(data);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -90,9 +88,9 @@ const updateIndustryStatus = async (req, res) => {
         const result = await industryModel.updateIndustryStatus(req.body.id, req.body.status);
 
         // user activity 
-        await activity_log(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "INDUSTRY_STATUS_UPDATE", "UPDATE");
+        await userActivityLog(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "Industry status update successfully", "UPDATE");
 
-        return res.status(200).json({ success: res.__("INDUSTRY_STATUS_UPDATE"), });
+        return res.status(200).json({ success: res.__("Industry status update successfully"), });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -101,24 +99,38 @@ const updateIndustryStatus = async (req, res) => {
 // add industry
 const addIndustry = async (req, res) => {
     try {
-        const { industry, status } = req.body;
-        const result = await industryModel.checkIndustry(industry);
-        if (result) return res.status(200).json({ error: res.__("INDUSTRRY_ALREADY_EXIST") });
+        const { name, status } = req.body;
+        const result = await industryModel.checkIndustry(name);
+        if (result) return res.status(200).json({ error: res.__("Industry name already exits") });
+
+        let baseSlug = slugify(name, { lower: true, strict: true });
+
+        let finalSlug = baseSlug, count = 1;
+
+        if (slug) {
+            const data = await industryModel.checkIndustry(finalSlug)
+            if (data) return res.status(200).json({ error: res.__('Slug must be unique. This slug already exists.') })
+        }
+
+
+        while (await industryModel.checkSlug(finalSlug)) {
+            finalSlug = `${baseSlug}-${count++}`;
+        }
         // insert industry
-        const industryId = await industryModel.addIndustry(slug(industry));
+        const industryId = await industryModel.addIndustry(finalSlug, status);
+
         // insert industry meta
         const metaData = {
-            catalog_industry_id: industryId,
-            name: industry,
-            status,
+            industry_id: industryId,
+            name,
         }
-        const metaResult = await industryModel.addIndustryMeta(metaData);
+        const metaResult = await industryModel.addIndustryInfo(metaData);
         if (industryId && metaResult) {
             // user activity
-            await activity_log(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "INDUSTRY_ADDED", "ADD");
-            return res.status(200).json({ success: res.__("INDUSTRY_ADDED") });
+            await userActivityLog(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "Industry added successfully", "ADD");
+            return res.status(200).json({ success: res.__("Industry added successfully") });
         }
-        return res.status(200).json({ error: res.__("INDUSTRY_ADD_ERROR") });
+        return res.status(200).json({ error: res.__("") });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -131,8 +143,8 @@ const editIndustry = async (req, res) => {
         const result = await industryModel.getIndustryData(req.body.id);
         const updatePer = await checkPermissionEJS('industries', 'update', req);
 
-        if (!result) return res.status(200).json({ error: res.__("INDUSTRY_NOT_EXITS") });
-        return res.status(200).json({ result: result, update_url: industryPath.INDUSTRY_UPDATE_ACTION_URL + req.body.id, updatePer:updatePer });
+        if (!result) return res.status(200).json({ error: res.__("Industry not exits, please try again") });
+        return res.status(200).json({ result: result, update_url: industryPath.INDUSTRY_UPDATE_ACTION_URL + req.body.id, updatePer: updatePer });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -143,18 +155,18 @@ const editIndustry = async (req, res) => {
 const updateIndustry = async (req, res) => {
     try {
 
-        const { industry, status } = req.body;
+        const { name, status } = req.body;
         const result = await industryModel.getIndustryData(req.params.id);
-        if (!result) return res.status(200).json({ error: res.__("INDUSTRY_NOT_EXITS") });
+        if (!result) return res.status(200).json({ error: res.__("Industry not exits") });
 
-        const data = await industryModel.updateIndustry(slug(industry), industry, status, req.params.id);
+        const data = await industryModel.updateIndustry(name, status, req.params.id);
 
         if (data) {
             // user activity
-            await activity_log(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "INDUSTRY_UPDATE", "UPDATE");
-            return res.status(200).json({ success: res.__("INDUSTRY_UPDATE") });
+            await userActivityLog(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "Industry updated successfully", "UPDATE");
+            return res.status(200).json({ success: res.__("Industry updated successfully") });
         }
-        return res.status(200).json({ error: res.__("INDUSTRY_UPDATE_ERROR") });
+        return res.status(200).json({ error: res.__("Technical issue update industry, please try again") });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -162,31 +174,16 @@ const updateIndustry = async (req, res) => {
 }
 
 // delete industry
-const bulkAction = async (req, res) => {
-    try {
+const deleteIndustry = async (req, res) => {
+    const result = await industryModel.getIndustryData(req.params.id);
+    if (!result) return res.status(200).json({ error: res.__("Industry not exits") });
+    const data = await industryModel.deleteIndustry(req.params.id);
+    if (!data) return res.status(200).json({ error: res.__("Technical issue delete industry, please try again") });
+    await userActivityLog(req, req.session.userId, industryPath.INDUSTRY_DELETE_ACTION_URL + req.params.id, "Industry delete successfully", "Delete");
+    return res.status(200).json({ success: res.__("Industry delete successfully") });
+}
 
-        const { actionVal, indIds } = req.body;
-        const ids = Array.isArray(indIds) ? indIds : [indIds];
-        const industryData = await industryModel.checkIndustryUseInProduct(ids);
-        let result = false;
 
-        if (actionVal != 2) {
-            result = await Promise.all(ids.map(id => industryModel.bulkActionStatus(id, actionVal)));
-            await activity_log(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "INDUSTRY_STATUS_UPDATE", "UPDATE");
-            return res.status(200).json({ success: result ? res.__("INDUSTRY_STATUS_UPDATE") : res.__("INDUSTRY_STATUS_UPDATE_ERROR") });
-        } else {
-            if (industryData.length > 0) {
-                return res.status(200).json({ error: res.__("INDUSTRY_IN_USE") });
-            }
-            result = await Promise.all(ids.map(id => industryModel.bulkActionDelete(id)));
-            await activity_log(req, req.session.userId, industryPath.INDUSTRY_LIST_VIEW_PAGE, "INDUSTRY_DELETE", "DELETE");
-            return res.status(200).json({ success: result ? res.__("INDUSTRY_DELETE") : res.__("INDUSTRY_DELETE_ERROR") });
-        }
-       
-    } catch (error) {
-        return res.status(500).json({ error: error.message });
-    }
-};
 
 
 
@@ -200,8 +197,6 @@ module.exports = {
     addIndustry,
     editIndustry,
     updateIndustry,
-    bulkAction
-
-
+    deleteIndustry
 }
 

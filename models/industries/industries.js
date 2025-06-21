@@ -1,13 +1,11 @@
-const express = require('express');
-const app = express.Router();
-const IndustryTables = require('@config/databasetable');
+const industryTables = require('@config/table');
 const db = require('@config/db');
 
 
 module.exports = {
     // industry datatable
     industryDataTable: async (where, start, limit, sort, order) => {
-        const query = `SELECT ci.id AS industryId, cim.*, COUNT(ci.id) OVER() AS total,(SELECT COUNT(*) FROM ${IndustryTables.tbl_catalog_categories}  WHERE catalog_industry_id = ci.id ) AS category_count FROM ${IndustryTables.tbl_catalog_industries} AS ci LEFT JOIN ${IndustryTables.tbl_catalog_industry_metas} AS cim ON cim.catalog_industry_id = ci.id WHERE ${where}  ORDER BY ${sort} ${order} LIMIT ${start}, ${limit} `
+        const query = `SELECT i.id, i.status, info.name, COUNT(i.id) OVER() AS total FROM ${industryTables.industry} AS i LEFT JOIN ${industryTables.industry_info} AS info ON info.industry_id = i.id WHERE ${where}  ORDER BY ${sort} ${order} LIMIT ${start}, ${limit} `
         const value = [];
         const result = await db.query(query, value);
         return result || '';
@@ -15,56 +13,51 @@ module.exports = {
 
     // update industry status
     updateIndustryStatus: async (id, status) => {
-        const result = await db.query(`UPDATE ${IndustryTables.tbl_catalog_industries} set status = ${status} WHERE id = '${id}'`);
+        const result = await db.query(`UPDATE ${industryTables.industry} set status = ? WHERE id = ?`, [status, id]);
         return result || '';
+    },
+
+    // check slug
+    checkSlug: async (slug) => {
+        const result = await db.query(`SELECT * FROM ${industryTables.industry} WHERE slug = '${slug}'`);
+        return result[0] || '';
     },
 
     // check industry
     checkIndustry: async (name) => {
-        const result = await db.query(`SELECT * FROM ${IndustryTables.tbl_catalog_industry_metas} WHERE name = '${name}'`);
+        const result = await db.query(`SELECT * FROM ${industryTables.industry_info} WHERE name = '${name}'`);
         return result[0] || '';
     },
 
     // add industry
-    addIndustry: async (data) => {
-        const result = await db.query(`INSERT INTO ${IndustryTables.tbl_catalog_industries} (slug) VALUES(?)`, [data]);
+    addIndustry: async (slug, status) => {
+        const result = await db.query(`INSERT INTO ${industryTables.industry} (slug, status) VALUES(?, ?)`, [slug, status]);
         return Number(result.insertId) || '';
     },
 
-    addIndustryMeta: async (data) => {
-        const result = await db.query(`INSERT INTO ${IndustryTables.tbl_catalog_industry_metas} (catalog_industry_id, name, status) VALUES(?, ?, ?)`, [data.catalog_industry_id, data.name, data.status]);
+    addIndustryInfo: async (data) => {
+        const result = await db.query(`INSERT INTO ${industryTables.industry_info} (industry_id, name) VALUES(?, ?)`, [data.industry_id, data.name]);
         return result || '';
     },
 
     // get industry data
     getIndustryData: async (id) => {
-        const result = await db.query(`SELECT cim.*, ci.slug FROM ${IndustryTables.tbl_catalog_industries} AS ci LEFT JOIN ${IndustryTables.tbl_catalog_industry_metas} AS cim ON cim.catalog_industry_id = ci.id WHERE ci.id = '${id}'`);
+        const result = await db.query(`SELECT i.id, i.status, info.name FROM ${industryTables.industry} AS i LEFT JOIN ${industryTables.industry_info} AS info ON info.industry_id = i.id WHERE i.id = '${id}'`);
         return result[0] || '';
     },
     // update industry data
-    updateIndustry: async (slug, name, status, id) => {
-        const result = await db.query(`START TRANSACTION; UPDATE ${IndustryTables.tbl_catalog_industries} SET slug = ? WHERE id = ?; UPDATE ${IndustryTables.tbl_catalog_industry_metas} SET name = ?, status = ?  WHERE id = ?; COMMIT;`, [slug, id, name, status, id]);
-        return result || '';
-    },
-    // bulk action status
-    bulkActionStatus: async (id, val) => {
-        const result = await db.query(`UPDATE ${IndustryTables.tbl_catalog_industry_metas} SET status = ? WHERE id IN (?)`, [val, id]);
-        return result || '';
-    },
-    // bulk action delete
-    bulkActionDelete: async (id) => {
-        const result = await db.query(`DELETE FROM ${IndustryTables.tbl_catalog_industries} WHERE id IN (?)`, [id]);
-        return result || '';
+    updateIndustry: async (name, status, id) => {
+        const result = await db.query(`UPDATE ${industryTables.industry} SET status = ? WHERE id = ?`, [status, id]);
+        if (result?.affectedRows > 0) {
+            await db.query(`UPDATE ${industryTables.industry_info} SET name = ? WHERE industry_id = ?`, [name, id]);
+        } return result || '';
     },
 
-    //check industry in product
-    checkIndustryUseInProduct: async (ids) => {
-        const placeholders = ids.map(() => '?').join(', ');
-        const query = `SELECT * FROM ${IndustryTables.tbl_catalog_products} WHERE industry_id IN (${placeholders})`;
-        const result = await db.query(query, ids);
-        return result || [];
-    },
+    // delete industry
+    deleteIndustry: async (id) => {
+        const result = await db.query(`DELETE FROM ${industryTables.industry} WHERE id = ?`, [id]);
+        return result || '';
 
-
+    }
 
 }

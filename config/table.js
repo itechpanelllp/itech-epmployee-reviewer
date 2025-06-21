@@ -9,6 +9,14 @@ module.exports = {
     city: 'city',
     sidebar_menus: 'sidebar_menus',
     configuration: 'configuration',
+    industry:'industry',
+    industry_info:'industry_info',
+    companies:'companies',
+    company_address:'company_address',
+    company_documents:'company_documents',
+    company_types:'company_types',
+    employee_strength:'employee_strength',
+  
    
 
 

@@ -1,31 +1,31 @@
 const express = require('express');
 const app = express.Router();
-const industryController = require('@industryController/industries');
-const path = require('./industriesPath');
-const{ checkSession }=  require('@middleware/session');
+const industryController = require('@industryController/industry');
+const path = require('./industryPath');
 const industryField = require('@industryController/industryValidation');
-const { checkPermission } = require('@middleware/permissionCheck');
+const { checkSession } = require('@middleware/session');
+const { checkPermission } = require('@middleware/checkPermission');
 
 // show industries list view page
-app.get(`/${path.INDUSTRY_LIST_VIEW_PAGE}`, checkSession, checkPermission('industries','view'), industryController.industryList),
+app.get(`/${path.INDUSTRY_LIST_VIEW_PAGE}`, checkSession, checkPermission('industry','view'), industryController.industryList),
 
-// get industries data table
-app.post(`/${path.INDUSTRY_DATATABLE_ACTION_URL}`, checkSession, checkPermission('industries','view'), industryController.industryDataTable);
+// get industry data table
+app.post(`/${path.INDUSTRY_DATATABLE_ACTION_URL}`, checkSession, checkPermission('industry','view'), industryController.industryDataTable);
 
-// // udate industries status
-// app.post(`/${path.INDUSTRY_STATUS_UPDATE_URL}`, checkSession, checkPermission('industries','update'), industryController.updateIndustryStatus);
+// udate industry status
+app.post(`/${path.INDUSTRY_STATUS_UPDATE_URL}`, checkSession, checkPermission('industry','update'), industryController.updateIndustryStatus);
 
-// add industries 
-app.post(`/${path.INDUSTRY_ADD_ACTION_URL}`, checkSession, industryField, checkPermission('industries','add'), industryController.addIndustry);
+// add industry 
+app.post(`/${path.INDUSTRY_ADD_ACTION_URL}`, checkSession, industryField, checkPermission('industry','add'), industryController.addIndustry);
 
 // edit industry
-app.post(`/${path.INDUSTRY_EDIT_ACTION_URL}`, checkSession, checkPermission('industries','view'), industryController.editIndustry);
+app.post(`/${path.INDUSTRY_EDIT_ACTION_URL}`, checkSession, checkPermission('industry','view'), industryController.editIndustry);
 
 // update industry
-app.post(`/${path.INDUSTRY_UPDATE_ACTION_URL}:id`, checkSession, industryField, checkPermission('industries','update'), industryController.updateIndustry);
+app.post(`/${path.INDUSTRY_UPDATE_ACTION_URL}:id`, checkSession, industryField, checkPermission('industry','update'), industryController.updateIndustry);
 
-// delete industry
-app.post(`/${path.INDUSTRY_BULK_ACTION_URL}`, checkSession, checkPermission('industries','update'), industryController.bulkAction);
+// // delete industry
+app.post(`/${path.INDUSTRY_DELETE_ACTION_URL}:id`, checkSession, checkPermission('industry','delete'), industryController.deleteIndustry);
 
 
 

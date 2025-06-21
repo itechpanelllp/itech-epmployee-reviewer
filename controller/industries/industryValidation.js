@@ -15,7 +15,7 @@ const validationHandler = (req, res, next) => {
 
 // Validation rules
 const industryField = [
-    body('industry').notEmpty().withMessage((_, { req }) => req.__('INDUSTRY_NAME_REQ')),
+    body('name').notEmpty().withMessage((_, { req }) => req.__('Industry name is required')),
     validationHandler
 ];
 
