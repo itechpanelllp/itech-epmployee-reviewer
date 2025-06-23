@@ -1,0 +1,172 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+<div class="row">
+    <%- include('./businessSidebar')%>
+    <div class="col-lg-9">
+        <div class="tab-content text-muted mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body p-4">
+                    <% let updateUrl = updatePer ? base_url + update_company : '' %>
+                    <form action="<%= updateUrl %>" id="updateCompany">
+                        <div class="row">
+                            <!-- business type -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="businessType"
+                                        class="form-label required_field"><%=__("Business Type") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select name="businessType" id="businessType" class="form-select">
+                                        <option value><%=__("Select business type") %></option>
+                                        <% companyType.forEach( item => { %>
+                                        <option value="<%= item.id %>" <%= data.company_type_id == item.id ? 'selected' : '' %>><%= item.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <span id="businessTypeError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- business name -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="businessName"
+                                        class="form-label required_field"><%=__("Business name") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control" id="businessName" name="businessName"
+                                        placeholder="<%=__("Business name") %>" value="<%= data.business_name  || ''%>">
+                                    <span id="businessNameError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- business email -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="businessEmail"
+                                        class="form-label required_field"><%=__("Business Email") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control" id="businessEmail" name="businessEmail"
+                                        placeholder="<%=__("Business Email") %>" value="<%= data.business_email  || ''%>">
+                                    <span id="businessEmailError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- business phone -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="businessPhone"
+                                        class="form-label required_field"><%=__("Business Phone Number") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control" id="businessPhone" name="businessPhone"
+                                        placeholder="<%=__("Business Phone Number") %>" value="<%= data.business_phone  || ''%>">
+                                    <span id="businessPhoneError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- employee strength -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employeeStrength"
+                                        class="form-label required_field"><%=__("Employee Strength") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select name="employeeStrength" id="employeeStrength" class="form-select">
+                                        <option value><%=__("Select Employee Strength") %></option>
+                                        <% employeeStrength.forEach( item => { %>
+                                        <option value="<%= item.id %>" <%= data.employee_strength == item.id ? 'selected' : '' %>><%= item.range_label %></option>
+                                        <% }) %>
+                                    </select>
+                                    <span id="employeeStrengthError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- busienss website -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="businessWebsite"
+                                        class="form-label required_field"><%=__("Business Website") %></label>
+                                    <input type="text" class="form-control" id="businessWebsite" name="businessWebsite"
+                                        placeholder="<%=__("Business Website") %>" value="<%= data.website  || ''%>">
+                                    <span id="businessWebsiteError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- status -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="companyStatus" class="form-label required_field"><%=__("Status") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select name="companyStatus" id="companyStatus" class="form-select">
+                                        <option value="active" <%= data.status == 'active' ? 'selected' : '' %>><%=__("Active") %></option>
+                                        <option value="inactive" <%= data.status == 'inactive' ? 'selected' : '' %>><%=__("Inactive") %></option>
+                                    </select>
+                                    <span id="companyStatusError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <% if(updatePer) { %>
+                        <div class="float-end">
+                            <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                        </div>
+                        <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../../common/footer') %>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+
+        //number validation
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+
+
+        // error remove when key text and change select
+        $('#updateCompany').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+
+
+
+
+        // form submit
+        $('#updateCompany').submit(function (e) {
+            e.preventDefault();
+            $('#loader').show();
+            $('.errorRemove').text('');
+
+            $.post({ url: $(this).attr('action'), data: $(this).serialize() }).done(res => {
+                if (res.errors) {
+                    $('#loader').hide();
+                    let firstErrorField = null;
+                    for (const field in res.errors) {
+                        const normalizedField = field.replace(/\[|\]/g, '_');
+                        const $input = $(this).find(`[name="${field}"]`);
+                        const $error = $(`#${normalizedField}Error`);
+                        $error.text(res.errors[field]);
+                        if (!firstErrorField && $input.length) {
+                            firstErrorField = $input;
+                        }
+                    }
+                    if (firstErrorField) {
+                        firstErrorField.focus();
+                    }
+                } else {
+                    showMsg(res.success || res.error, res.success ? "success" : "danger");
+                    if (res.success) setTimeout(() => $('#loader').hide(), location.reload(), 1500);
+                    if (res.error) setTimeout(() => $('#loader').hide(), 1500);
+                }
+            });
+        });
+
+        // msg show
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+
+
+
+
+
+
+
+    })    
+</script>

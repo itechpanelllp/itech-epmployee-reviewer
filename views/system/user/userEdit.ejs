@@ -148,7 +148,7 @@
         // get state
         $(document).on('change', '.country', function () {
             $.post(`<%= base_url + get_state %>`, { country: $(this).val() }).done(res =>
-                $('#state').html(res.state?.map(({ id, name }) => `<option value="${id}">${name}</option>`).join('') || '')
+                $('#state').html(res.state?.map(({ id, name, country }) => `<option value="${id}" data-country="${country}">${name}</option>`).join('') || '')
                     .val(`<%= metaData.find(item => item.meta_key == 'state')?.meta_value || '' %>`).trigger('change'));
         });
         $('.country').val(`<%= metaData.find(item => item.meta_key == 'country')?.meta_value || '' %>`).trigger('change');

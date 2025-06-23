@@ -1,0 +1,38 @@
+<div class="col-lg-12">
+  <div class="card">
+    <div class="card-header d-flex justify-content-lg-between align-items-center">
+      <% let business_name = data.business_name ? data.business_name.charAt(0).toUpperCase() + data.business_name.slice(1) : '' %>
+      <h5 class="card-title m-0"><%= business_name %></h5>
+
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-3">
+  <div class="card">
+    <div class="px-2 py-3">
+      <div class="col-md-12">
+        <div class="nav flex-column nav-pills">
+          <% 
+          const navItems = [
+            { key: 'business_info', label: "Business info" },
+            { key: 'contact_info', label: "Contact info" },
+            { key: 'address', label: "Address" },
+            { key: 'documents', label: "Documents" },
+           
+          ];
+
+        navItems.forEach(item => {
+            const isActive = (currentPage === item.key);
+        %>
+
+          <a class="nav-link mb-2 <%= isActive ? 'active' : '' %>"
+            href="<%= isActive ? '#' : base_url + (urls[item.key]) %>"><%= item.label %></a>
+
+          <% }) %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

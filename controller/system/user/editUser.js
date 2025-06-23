@@ -47,7 +47,8 @@ const getState = async (req, res) => {
 // get city
 const getCity = async (req, res) => {
     try {
-        const city = await userModel.getCity(req.body.state);
+         const { country, state } = req.body;
+        const city = await userModel.getCity({ country, state });
         return res.status(200).json({ city: city });
     } catch (error) {
         return res.status(500).json({ error: error.message })

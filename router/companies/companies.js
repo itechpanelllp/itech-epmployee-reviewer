@@ -25,19 +25,18 @@ app.get(`/${path.COMPANIES_LIST_VIEW}`, checkSession, checkPermission('companies
 // companies datatable
 app.post(`/${path.COMPANIES_DATATABLE_ACTION}`, checkSession, checkPermission('companies', 'view'), companyListController.companiesDataTable);
 
+// companies status update
+app.post(`/${path.COMPANIES_STATUS_UPDATE_ACTION}`, checkSession, checkPermission('companies', 'view'), companyListController.updateCompanyStatus);
+
 // companies add
 app.get(`/${path.COMPANIES_ADD_VIEW}`, checkSession, checkPermission('companies', 'add'), addCompanyController.addCompanyView);
 
 app.post(`/${path.COMPANIES_ADD_ACTION}`, checkSession, uploadWithErrorHandler, checkPermission('companies', 'add'), companiesValidation, addCompanyController.addCompanyAction);
 
-// // companies edit
-// app.get(`/${path.COMPANIES_EDIT_ACTION}:id`, checkSession, checkPermission('companies','view'), companiesController.editCompanies);
 
-// // companies update
-// app.post(`/${path.COMPANIES_UPDATE_ACTION}:id`, checkSession, companiesValidation, checkPermission('companies','update'), companiesController.updateCompanies);
 
-// // companies delete
-// app.post(`/${path.COMPANIES_DELETE_ACTION}:id`, checkSession, checkPermission('companies','delete'), companiesController.deleteCompanies);
+// companies delete
+app.post(`/${path.COMPANIES_DELETE_ACTION}:id`, checkSession, checkPermission('companies','delete'), companyListController.deleteCompany);
 
 
 module.exports = app;

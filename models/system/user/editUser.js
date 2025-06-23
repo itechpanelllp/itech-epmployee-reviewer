@@ -30,8 +30,12 @@ module.exports = {
         return result || '';
     },
     // get city
-    getCity: async (code) => {
-        const result = await db.query(`SELECT * FROM ${userTables.city} WHERE state_id = ? ORDER BY name ASC`, [code]);
+    getCity: async ({ country, state }) => {
+        const where = [];
+        const values = [];
+        if (state) { where.push('state_id = ?'); values.push(state); }
+        if (country) { where.push('country_id = ?'); values.push(country); }
+        const query = ` SELECT * FROM ${userTables.city} ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY name ASC `; const result = await db.query(query, values);
         return result || '';
     },
     // update user

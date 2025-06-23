@@ -15,7 +15,7 @@ module.exports = {
     },
     // get city
     getSettingCity: async (code) => {
-        const result = await db.query(`SELECT * FROM ${settingTables.city} WHERE state_id = ? ORDER BY name ASC`, [code]);
+        const result = await db.query(`SELECT * FROM ${settingTables.city} WHERE state_id = ?  ORDER BY name ASC`, [code]);
         return result || '';
     },
       // get site configuration data

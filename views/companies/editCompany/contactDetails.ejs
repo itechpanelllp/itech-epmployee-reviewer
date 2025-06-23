@@ -1,0 +1,120 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+<div class="row">
+    <%- include('./businessSidebar')%>
+    <div class="col-lg-9">
+        <div class="tab-content text-muted mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body p-4">
+                    <% let updateUrl = updatePer ? base_url + update_company : '' %>
+                    <form action="<%= updateUrl %>" id="updateCompany">
+                        <div class="row">
+                            <!-- Contact Person name -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contactPersonName"
+                                        class="form-label"><%=__("Contact Person Name") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control" id="contactPersonName"
+                                        name="contactPersonName" placeholder="<%=__("Contact Person Name") %>" value="<%= data.name || ''%>">
+                                    <span id="contactPersonNameError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- Contact Person email -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contactPersonEmail"
+                                        class="form-label"><%=__("Contact Person Email") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control" id="contactPersonEmail"
+                                        name="contactPersonEmail" placeholder="<%=__("Contact Person Email") %>" value="<%= data.email || ''%>">
+                                    <span id="contactPersonEmailError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                            <!-- Contact Person phone number -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contactPersonPhone"
+                                        class="form-label"><%=__("Conatct Person Phone Number") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control number_validation" id="contactPersonPhone"
+                                        name="contactPersonPhone" placeholder="<%=__("Conatct Person Phone Number") %>" value="<%= data.phone || ''%>">
+                                    <span id="contactPersonPhoneError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <% if(updatePer) { %>
+                        <div class="float-end">
+                            <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                        </div>
+                        <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../../common/footer') %>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+
+        //number validation
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+
+
+        // error remove when key text and change select
+        $('#updateCompany').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+
+
+
+
+        // form submit
+        $('#updateCompany').submit(function (e) {
+            e.preventDefault();
+            $('#loader').show();
+            $('.errorRemove').text('');
+
+            $.post({ url: $(this).attr('action'), data: $(this).serialize() }).done(res => {
+                if (res.errors) {
+                    $('#loader').hide();
+                    let firstErrorField = null;
+                    for (const field in res.errors) {
+                        const normalizedField = field.replace(/\[|\]/g, '_');
+                        const $input = $(this).find(`[name="${field}"]`);
+                        const $error = $(`#${normalizedField}Error`);
+                        $error.text(res.errors[field]);
+                        if (!firstErrorField && $input.length) {
+                            firstErrorField = $input;
+                        }
+                    }
+                    if (firstErrorField) {
+                        firstErrorField.focus();
+                    }
+                } else {
+                    showMsg(res.success || res.error, res.success ? "success" : "danger");
+                    if (res.success) setTimeout(() => $('#loader').hide(), location.reload(), 1500);
+                    if (res.error) setTimeout(() => $('#loader').hide(), 1500);
+                }
+            });
+        });
+
+        // msg show
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+
+
+
+
+
+
+
+    })    
+</script>

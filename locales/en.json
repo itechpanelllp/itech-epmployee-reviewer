@@ -223,6 +223,17 @@
 	"Pan Number is required": "Pan Number is required",
 	"Invalid PAN number format": "Invalid PAN number format",
 	"PAN Number is required": "PAN Number is required",
-	"Please enter a valid website URL format": "Please enter a valid website URL format"
-	
+	"Please enter a valid website URL format": "Please enter a valid website URL format",
+	"Operational State is required": "Operational State is required",
+	"Operational City is required": "Operational City is required",
+	"Contact Person details": "Contact Person details",
+	"Contact Person Address": "Contact Person Address",
+	"No account found with that email address.": "No account found with that email address.",
+	"Company added successfully": "Company added successfully",
+	"Company status update successfully": "Company status update successfully",
+	"Company deleted successfully": "Company deleted successfully",
+	"Edit Company": "Edit Company",
+	"Company updated successfully": "Company updated successfully",
+	"Edit contact person details": "Edit contact person details",
+	"Conatct person updated successfully": "Conatct person updated successfully"
 }
