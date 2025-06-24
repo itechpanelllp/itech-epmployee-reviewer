@@ -14,6 +14,9 @@ router.use('/', require('./industries/industries'));
 router.use('/', require('./companies/companies'));
 router.use('/', require('./companies/editCompany'));
 router.use('/', require('./companies/conatctDetails'));
+router.use('/', require('./companies/addressDetails'));
+router.use('/', require('./companies/documentsDetails'));
+router.use('/', require('./companies/password'));
 
 
 

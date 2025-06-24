@@ -18,6 +18,7 @@ const editCompanyView = async (req, res) => {
             contact_info: companyPath.COMPANIES_CONTACT_INFO_VIEW + id,
             address: companyPath.COMPANIES_ADDRESS_VIEW + id,
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
+            password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
         const updatePer = await checkPermissionEJS('companies', 'update', req);
         const companyType = await companyModel.getCompanyType();
@@ -49,11 +50,10 @@ const updateCompanyAction = async (req, res) => {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
 
-        const { businessType, businessName, businessEmail, businessPhone, employeeStrength, businessWebsite, companyStatus } = req.body;
+        const { businessType, businessName, businessPhone, employeeStrength, businessWebsite, companyStatus } = req.body;
         const companyData = {
             company_type_id: businessType,
             business_name: businessName,
-            business_email: businessEmail,
             business_phone: businessPhone,
             employee_strength: employeeStrength,
             website: businessWebsite,

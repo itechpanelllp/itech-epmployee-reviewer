@@ -1,11 +1,11 @@
 const companyPath = require('@companyRouter/companiesPath')
-const companyModel = require('@companyModel/editCompany/conatctDetails')
+const companyModel = require('@companyModel/editCompany/password')
 const { userActivityLog } = require('@middleware/commonMiddleware');
 const { checkPermissionEJS } = require('@middleware/checkPermission');
+const bcrypt = require('bcrypt');
 
-
-// edit contact person details view
-const editContactPersonView = async (req, res) => {
+// edit password view
+const editPasswordView = async (req, res) => {
     try {
         let id = req.params.id;
         const result = await companyModel.companyData(id);
@@ -21,14 +21,14 @@ const editContactPersonView = async (req, res) => {
         };
         const updatePer = await checkPermissionEJS('companies', 'update', req);
 
-        res.render('companies/editCompany/contactDetails', {
-            title: res.__("Edit contact person details"),
+        res.render('companies/editCompany/password', {
+            title: res.__("Edit password"),
             session: req.session,
             updatePer,
             urls,
             data: result,
-            update_company: companyPath.COMPANIES_CONTACT_INFO_UPDATE_ACTION + id,
-            currentPage: 'contact_info',
+            update_password: companyPath.COMPANIES_PASSWORD_UPDATE_ACTION + id,
+            currentPage: 'password',
 
         })
     } catch (error) {
@@ -37,23 +37,25 @@ const editContactPersonView = async (req, res) => {
 }
 
 
-// update company
-const updateContactPerson = async (req, res) => {
+// update password
+const updatePasswordAction = async (req, res) => {
     try {
         let id = req.params.id;
-        const { contactPersonName, contactPersonEmail, contactPersonPhone, } = req.body;
-        const companyData = {
-            name: contactPersonName,
-            email: contactPersonEmail,
-            phone: contactPersonPhone,
+        const { password, confirmPassword } = req.body;
+       
+        if (password !== confirmPassword) {
+            return res.status(200).json({ errors: {confirmPassword: res.__("Password and confirm password does not match")}
+            });
         }
-        const setKeys = Object.keys(companyData).map(key => `${key} = ?`).join(", ");
-        const setValues = [...Object.values(companyData), id];
-        const updateResult = await companyModel.updateContactPerson(setKeys, setValues);
+
+        // update password
+        let data = password ? await bcrypt.hash(password, 10) : '';
+        const updateResult = await companyModel.updatePassword(data, id);
+
         if (!updateResult) return res.status(200).json({ error: res.__("Something went wrong, please try again") });
         // user activity 
-        await userActivityLog(req, req.session.userId, companyPath.COMPANIES_CONTACT_INFO_VIEW + id, "Conatct person updated successfully", "UPDATE");
-        return res.status(200).json({ success: res.__("Conatct person updated successfully") });
+        await userActivityLog(req, req.session.userId, companyPath.COMPANIES_PASSWORD_UPDATE_ACTION + id, "Password updated successfully", "UPDATE");
+        return res.status(200).json({ success: res.__("Password updated successfully") });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -62,6 +64,6 @@ const updateContactPerson = async (req, res) => {
 
 
 module.exports = {
-    editContactPersonView,
-    updateContactPerson
+    editPasswordView,
+    updatePasswordAction
 }

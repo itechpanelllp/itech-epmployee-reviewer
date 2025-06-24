@@ -17,17 +17,25 @@ const editBusinessAddressView = async (req, res) => {
             contact_info: companyPath.COMPANIES_CONTACT_INFO_VIEW + id,
             address: companyPath.COMPANIES_ADDRESS_VIEW + id,
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
+            password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
         const updatePer = await checkPermissionEJS('companies', 'update', req);
+        const addressData = await companyModel.getCompanyAddress(id);
+        const country = await companyModel.getCountry();
 
-        res.render('companies/editCompany/contactDetails', {
+        res.render('companies/editCompany/addressDetails', {
             title: res.__("Edit business address"),
             session: req.session,
             updatePer,
             urls,
             data: result,
-            update_company: companyPath.COMPANIES_CONTACT_INFO_UPDATE_ACTION + id,
-            currentPage: 'contact_info',
+            regAddress: addressData.registration || {},
+            operAddress: addressData.operational || {},
+            country,
+            get_state: companyPath.COMPANIES_STATE_ACTION,
+            get_city: companyPath.COMPANIES_CITY_ACTION,
+            update_address: companyPath.COMPANIES_ADDRESS_UPDATE_ACTION + id,
+            currentPage: 'address',
 
         })
     } catch (error) {
@@ -36,23 +44,43 @@ const editBusinessAddressView = async (req, res) => {
 }
 
 
-// update company
-const updateContactPerson = async (req, res) => {
+// update address
+const updateAddressAction = async (req, res) => {
     try {
         let id = req.params.id;
-        const { contactPersonName, contactPersonEmail, contactPersonPhone, } = req.body;
-        const companyData = {
-            name: contactPersonName,
-            email: contactPersonEmail,
-            phone: contactPersonPhone,
+        const { country, state, city, address, postalCode, operationalCountry, operationalState, operationalCity, operationalAddress, operationalPostalCode, sameAddress, } = req.body;
+
+        // delete old address
+        await companyModel.deleteAddress(id);
+
+        const companyAddress = {
+            company_id: id,
+            is_same_address: sameAddress ? sameAddress == 'on' ? 1 : 0 : '',
+            type: 'registered',
+            country: country,
+            state: state,
+            city: city,
+            address: address,
+            postal_code: postalCode
         }
-        const setKeys = Object.keys(companyData).map(key => `${key} = ?`).join(", ");
-        const setValues = [...Object.values(companyData), id];
-        const updateResult = await companyModel.updateContactPerson(setKeys, setValues);
-        if (!updateResult) return res.status(200).json({ error: res.__("Something went wrong, please try again") });
+     
+
+        const companyAddressResult = await companyModel.addAddress(companyAddress);
+        const companyOperationalAddress = {
+            company_id: id,
+            is_same_address: sameAddress ? sameAddress == 'on' ? 1 : 0 : '',
+            type: 'operational',
+            country: operationalCountry,
+            state: operationalState,
+            city: operationalCity,
+            address: operationalAddress,
+            postal_code: operationalPostalCode
+        }
+        const companyOpAddressResult = await companyModel.addAddress(companyOperationalAddress);
+
         // user activity 
-        await userActivityLog(req, req.session.userId, companyPath.COMPANIES_CONTACT_INFO_VIEW + id, "Conatct person updated successfully", "UPDATE");
-        return res.status(200).json({ success: res.__("Conatct person updated successfully") });
+        await userActivityLog(req, req.session.userId, companyPath.COMPANIES_ADDRESS_UPDATE_ACTION + id, "Business address updated successfully", "UPDATE");
+        return res.status(200).json({ success: res.__("Business address updated successfully") });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -61,6 +89,6 @@ const updateContactPerson = async (req, res) => {
 
 
 module.exports = {
-    editContactPersonView,
-    updateContactPerson
+    editBusinessAddressView,
+    updateAddressAction
 }

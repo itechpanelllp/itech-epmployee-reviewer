@@ -42,7 +42,7 @@
                                         class="form-label required_field"><%=__("Business Email") %><span
                                             class="text-danger"><%=__("*") %></span></label>
                                     <input type="text" class="form-control" id="businessEmail" name="businessEmail"
-                                        placeholder="<%=__("Business Email") %>" value="<%= data.business_email  || ''%>">
+                                        placeholder="<%=__("Business Email") %>" value="<%= data.business_email  || ''%>" readOnly>
                                     <span id="businessEmailError" class="text-danger errorRemove"></span>
                                 </div>
                             </div>
@@ -52,7 +52,7 @@
                                     <label for="businessPhone"
                                         class="form-label required_field"><%=__("Business Phone Number") %><span
                                             class="text-danger"><%=__("*") %></span></label>
-                                    <input type="text" class="form-control" id="businessPhone" name="businessPhone"
+                                    <input type="text" class="form-control number_validation" id="businessPhone" name="businessPhone"
                                         placeholder="<%=__("Business Phone Number") %>" value="<%= data.business_phone  || ''%>">
                                     <span id="businessPhoneError" class="text-danger errorRemove"></span>
                                 </div>

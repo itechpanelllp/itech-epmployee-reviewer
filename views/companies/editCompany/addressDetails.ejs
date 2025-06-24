@@ -1,0 +1,398 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+<div class="row">
+    <%- include('./businessSidebar')%>
+    <div class="col-lg-9">
+        <div class="tab-content text-muted mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body p-4">
+                    <% let updateUrl = updatePer ? base_url + update_address : '' %>
+                    <form action="<%= updateUrl %>" id="updateAddress">
+                        <div class="row">
+                            <span class="mb-3"><h5><%=__("Contact Person Address") %></h5></span>
+                            <!-- country -->
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label required_field"><%=__("Country") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <select name="country" id="countryReg" class="form-select country" data-type="reg"
+                                    data-placeholder="<%=__("Select Country") %>">
+                                    <option value=""><%=__("Select Country") %></option>
+                                    <% country.forEach( item => { %>
+                                    <option value="<%= item.id %>"><%= item.name %></option>
+                                    <% }) %>
+                                </select>
+                                <span id="countryError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- state -->
+                            <div class="col-md-6 mb-3 state-wrapper">
+                                <label class="form-label required_field"><%=__("State") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <select class="form-select state" id="state" name="state"
+                                    data-placeholder="<%=__("Select state") %>" data-type="reg">
+
+                                </select>
+                                <span id="stateError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- city -->
+                            <div class="col-md-6 mb-3 city-wrapper">
+                                <label class="form-label required_field"><%=__("City") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <select class="form-select city" id="city" name="city"
+                                    data-placeholder="<%=__("Select city") %>" data-type="reg">
+                                    <option value><%=__("Select City") %></option>
+                                </select>
+                                <span id="cityError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- address -->
+                            <div class="col-md-6 mb-3">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Address") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control" id="address" name="address"
+                                    placeholder="<%=__("Address") %>" value="">
+                                <span id="addressError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- postal code -->
+                            <div class="col-md-6 mb-3">
+                                <label for="example-url-input"
+                                    class="form-label required_field"><%=__("Postal Code") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" class="form-control number_validation" id="postalCode"
+                                    name="postalCode" placeholder="<%=__("Postal Code") %>" value="">
+                                <span id="postalCodeError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- same address -->
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="sameAddress" id="sameAddress">
+                                <label class="form-check-label"
+                                    for="sameAddress"><%=__("Same as business address") %></label>
+                            </div>
+                           
+                            <div class="operational_address row">
+                                 <span class="mb-3">
+                                <h5><%=__("Operational address") %></h5>
+                            </span>
+                                <!-- Operational country -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="country" class="form-label required_field"><%=__("Country") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select name="operationalCountry" id="countryOp" class="form-select country"
+                                        data-type="op" data-placeholder="<%=__("Select Country") %> ">
+                                        <option value><%=__("Select Country") %></option>
+                                        <% country.forEach( item => { %>
+                                        <option value="<%= item.id %>" ><%= item.name %>
+                                        </option>
+                                        <% }) %>
+                                    </select>
+                                    <span id="operationalCountryError" class="text-danger errorRemove"></span>
+                                </div>
+                                <!-- Operational state -->
+                                <div class="col-md-6 mb-3 state-wrapper">
+                                    <label class="form-label required_field"><%=__("State") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select class="form-select state" id="operationalState" name="operationalState"
+                                        data-placeholder="<%=__("Select state") %>" data-type="op">
+                                        <option value><%=__("Select State") %></option>
+                                    </select>
+                                    <span id="operationalStateError" class="text-danger errorRemove"></span>
+                                </div>
+                                <!-- Operational city -->
+                                <div class="col-md-6 mb-3 city-wrapper">
+                                    <label class="form-label required_field"><%=__("City") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <select class="form-select city operationalCity" id="operationalCity"
+                                        name="operationalCity" data-placeholder="<%=__("Select city") %>"
+                                        data-type="op">
+                                        <option value><%=__("Select City") %></option>
+                                    </select>
+                                    <span id="operationalCityError" class="text-danger errorRemove"></span>
+                                </div>
+                                <!-- Operational address -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="example-url-input"
+                                        class="form-label required_field"><%=__("Address") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control operationalAddress" id="operationalAddress"
+                                        name="operationalAddress" placeholder="<%=__("Address") %>" value="">
+                                    <span id="operationalAddressError" class="text-danger errorRemove"></span>
+                                </div>
+                                <!--Operational  postal code -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="example-url-input"
+                                        class="form-label required_field"><%=__("Postal Code") %><span
+                                            class="text-danger"><%=__("*") %></span></label>
+                                    <input type="text" class="form-control operationalPostalCode number_validation"
+                                        id="operationalPostalCode" name="operationalPostalCode"
+                                        placeholder="<%=__("Postal Code") %>" value="">
+                                    <span id="operationalPostalCodeError" class="text-danger errorRemove"></span>
+                                </div>
+                            </div>
+                        </div>
+                          <input type="hidden" name="hiddenFields" id="hiddenFieldsInput" />
+                        <% if(updatePer) { %>
+                        <div class="float-end">
+                            <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                        </div>
+                        <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../../common/footer') %>
+
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+         let skipValidationOnLoad = true;
+        $('.country, .state, .city').select2({ placeholder: function () { return $(this).data('placeholder'); }, sorter: s => s.sort((a, b) => a.text.localeCompare(b.text)) });
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                document.querySelector('.select2-container--open .select2-search__field')?.focus();
+            }, 0);
+        })
+        const reg = JSON.parse(`<%- JSON.stringify(regAddress || {}) %>`);
+        const op = JSON.parse(`<%- JSON.stringify(operAddress || {}) %>`);
+     
+     
+        function updateHiddenFields() {
+            const hidden = [];
+            ['state', 'city', 'operationalState', 'operationalCity'].forEach(field => {
+                const $el = $(`#${field}`);
+                const wrapper = $el.closest('.state-wrapper, .city-wrapper, .form-group, .mb-3');
+                if (wrapper.hasClass('d-none') || !$el.is(':visible')) {
+                    hidden.push(field);
+                }
+            });
+            $('#hiddenFieldsInput').val(hidden.join(','));
+        }
+
+        function syncOpFields() {
+            $('#operationalAddress').val($('#address').val());
+            $('#operationalPostalCode').val($('#postalCode').val());
+        }
+
+
+        $(document).on('change', '.country', function () {
+        const type = $(this).data('type');
+        const countryId = $(this).val();
+        const $state = $(`.state[data-type="${type}"]`);
+        const $city = $(`.city[data-type="${type}"]`);
+        const $stateWrapper = $state.closest('.state-wrapper');
+        const $cityWrapper = $city.closest('.city-wrapper');
+        // Reset and disable city
+        $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+        $city.prop('disabled', true);
+        $cityWrapper.removeClass('d-none');
+        $.post(`<%= base_url + get_state %>`, { country: countryId }, res => {
+            const states = res.state || [];
+              let stateOptions = `<option value="">${"<%= __('Select State') %>"}</option>`;
+                if (states.length > 0) {
+                    states.forEach(s => {
+                        stateOptions += `<option value="${s.id}">${s.name}</option>`;
+                    });
+                }
+             $state.html(stateOptions);
+            if (states.length === 0) {
+                $stateWrapper.addClass('d-none');
+                $.post(`<%= base_url + get_city %>`, { country: countryId }, res => {
+                    const cities = res.city || [];
+                    let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                    if (cities.length > 0) {
+                        cities.forEach(c => {
+                            cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                        });
+                        $city.html(cityOptions);
+                        $city.prop('disabled', false);
+                        $cityWrapper.removeClass('d-none');
+                        updateHiddenFields();
+                        $city.trigger('citiesLoaded');
+                    }else{
+                        $cityWrapper.addClass('d-none');
+                    }     
+                });
+
+            } else {
+                $stateWrapper.removeClass('d-none');
+            }
+        });
+    });
+
+    // State change handler
+    $(document).on('change', '.state', function () {
+        const type = $(this).data('type');
+        const stateId = $(this).val();
+        const countryId = $(`.country[data-type="${type}"]`).val();
+        const $city = $(`.city[data-type="${type}"]`);
+        const $cityWrapper = $city.closest('.city-wrapper');
+
+        if (!stateId) {
+            $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+            $cityWrapper.addClass('d-none');
+            updateHiddenFields();
+            return;
+        }
+
+        $cityWrapper.removeClass('d-none');
+        $city.prop('disabled', true);
+
+        $.post(`<%= base_url + get_city %>`, { country: countryId, state: stateId }, res => {
+            const cities = res.city || [];
+            let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+            if (cities.length > 0) {
+                cities.forEach(c => {
+                    cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                });
+            }
+            $city.html(cityOptions);
+            $city.prop('disabled', false);
+
+            if (cities.length === 0) {
+                $cityWrapper.addClass('d-none');
+            }
+
+            updateHiddenFields();
+            $city.trigger('citiesLoaded');
+        });
+    });
+       
+    // edit than load data
+    if (reg) {
+        $('#countryReg').val(reg.country).trigger('change'); 
+        $('#address').val(reg.address);
+        $('#postalCode').val(reg.postal_code);
+        setTimeout(() => {
+            $('#state').val(reg.state).trigger('change'); 
+            setTimeout(() => {
+                $('#city').val(reg.city).trigger('change');
+            }, 300);
+        }, 300);
+        }
+    if (op) {
+        $('#countryOp').val(op.country).trigger('change'); 
+        $('#operationalAddress').val(op.address);
+        $('#operationalPostalCode').val(op.postal_code);
+        setTimeout(() => {
+            $('#operationalState').val(op.state).trigger('change'); 
+            setTimeout(() => {
+                $('#operationalCity').val(op.city).trigger('change');
+            }, 300);
+        }, 300);
+    }
+
+        // Same as Registration Address handler
+        $('#sameAddress').on('change', function () {
+            const isChecked = this.checked;
+            const get = (type, cls) => $(`.${cls}[data-type="${type}"]`);
+            const $opCountry = get('op', 'country');
+            const $opState = get('op', 'state');
+            const $opCity = get('op', 'city');
+            const $regCountry = get('reg', 'country');
+            const $regState = get('reg', 'state');
+            const $regCity = get('reg', 'city');
+            const $regAddress = $('#address');
+            const $regPostalCode = $('#postalCode');
+            if (isChecked) {
+                const missingFields = [];
+              if (!skipValidationOnLoad) {
+                    if ($regCountry.is(':visible') && !$regCountry.val()) missingFields.push('country');
+                    if ($regState.is(':visible') && !$regState.val()) missingFields.push('state');
+                    if ($regCity.is(':visible') && !$regCity.val()) missingFields.push('city');
+                    if ($regAddress.is(':visible') && !$regAddress.val().trim()) missingFields.push('address');
+                    if ($regPostalCode.is(':visible') && !$regPostalCode.val().trim()) missingFields.push('postal code');
+
+                    if (missingFields.length > 0) {
+                        showMsg(`<%= __('Please fill in all visible required address fields before selecting "Same as Registration Address".') %>`, 'danger');
+                        $(this).prop('checked', false);
+                        return;
+                    }
+                }
+                $opCountry.val($regCountry.val()).trigger('change');
+                setTimeout(() => { $opState.val($regState.val()).trigger('change');
+                    $opCity.one('citiesLoaded', function () {
+                        $opCity.val($regCity.val());
+                    });
+                }, 300);
+                $opState.closest('.state-wrapper').removeClass('d-none');
+                $opCity.closest('.city-wrapper').removeClass('d-none');
+                $('.operational_address').addClass('d-none');
+                syncOpFields();
+            } else {
+                $('.operational_address').removeClass('d-none');
+            }
+            updateHiddenFields();
+        });
+        console.log(reg);
+        
+        const isSameAddress = reg.is_same_address == 1;
+        $('#sameAddress').prop('checked', isSameAddress).trigger('change');
+        setTimeout(() => {
+            skipValidationOnLoad = false;
+        }, 1000);
+        // Sync address and postal code if changed
+        $('#address, #postalCode').on('input', function () {
+            if ($('#sameAddress').is(':checked')) {
+                syncOpFields();
+            }
+        });
+
+        //number validation
+        $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
+        // error remove when key text and change select
+        $('#updateAddress').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+        // form submit
+        $('#updateAddress').submit(function (e) {
+            e.preventDefault();
+            $('#loader').show();
+            $('.errorRemove').empty();
+            if ($('#sameAddress').is(':checked')) {
+                const get = (type, cls) => $(`.${cls}[data-type="${type}"]`);
+                get('op', 'country').val(get('reg', 'country').val());
+                get('op', 'state').val(get('reg', 'state').val());
+                get('op', 'city').val(get('reg', 'city').val());
+                $('#operationalAddress').val($('#address').val());
+                $('#operationalPostalCode').val($('#postalCode').val());
+            }
+            updateHiddenFields();
+            $.post({ url: $(this).attr('action'), data: $(this).serialize() }).done(res => {
+                if (res.errors) {
+                    $('#loader').hide();
+                    let firstErrorField = null;
+                    for (const field in res.errors) {
+                        const normalizedField = field.replace(/\[|\]/g, '_');
+                        const $input = $(this).find(`[name="${field}"]`);
+                        const $error = $(`#${normalizedField}Error`);
+                        $error.text(res.errors[field]);
+                        if (!firstErrorField && $input.length) {
+                            firstErrorField = $input;
+                        }
+                    }
+                    if (firstErrorField) {
+                        firstErrorField.focus();
+                    }
+                } else {
+                    showMsg(res.success || res.error, res.success ? "success" : "danger");
+                    if (res.success) setTimeout(() => $('#loader').hide(), location.reload(), 1500);
+                    if (res.error) setTimeout(() => $('#loader').hide(), 1500);
+                }
+            });
+        });
+
+        // msg show
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+
+
+
+
+
+
+
+    })    
+</script>

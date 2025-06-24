@@ -62,6 +62,19 @@ var mail = module.exports = {
 		var content = $.html();
 		return mail.send_email(data.email, data.subject, content);
 	},
+	emailVerificationMail: function(data) {
+		
+		var template = fs.readFileSync(path.join(__dirname, `../public/email/email_verification.html`), 'utf8');
+		$ = cheerio.load(template);
+
+		$('#receiver').text(data.name);
+		$('#message').text(`${data.message}`);
+		$('#btn-link').attr('href', data.link).text(data.button_text);
+  		$('#footer').html(data.footer);
+		$('#support_team').text(data.support_team);
+		var content = $.html();
+		return mail.send_email(data.email, data.subject, content);
+	},
 
 
     send_email: async function(email, subject, content) {

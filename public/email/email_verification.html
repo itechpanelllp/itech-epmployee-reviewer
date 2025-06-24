@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email verification Successfully</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: hsl(0, 0%, 0%);
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    } 
+    h2 {
+      color: #333333;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777777;
+    }
+    
+    .logo-image{
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .logo_img {max-width: 150px;}
+    #support_team{
+      margin-top: 0 !important;
+    }
+    #footer{
+      margin-bottom: 0 !important;
+    }
+    @media screen and (max-device-width:640px), screen and (max-width:640px) {
+        .logo_img {max-width: 150px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo-image">
+    <a href="javascript:void(0)"><img class="logo_img" src="<%= base_url %>assets/images/favicon.ico"></a>
+  </div>
+ 
+  <p id="receiver"></p>
+  <p id="message"></p>
+  <p id="pass-reset-support-mail"></p>
+  <p><a href="javascript:void(0);" class="button" id="btn-link"></a></p>
+  <p class="footer" id="footer"></p>
+  <p class="footer" id="support_team"></p>
+</div>
+
+</body>
+</html>

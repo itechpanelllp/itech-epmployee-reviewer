@@ -19,8 +19,22 @@ module.exports = {
     COMPANIES_CONTACT_INFO_VIEW: 'companies/contact-info/',
     COMPANIES_CONTACT_INFO_UPDATE_ACTION: 'companies/contact-info/',
 
+    // address
     COMPANIES_ADDRESS_VIEW: 'companies/address/',
+    COMPANIES_ADDRESS_UPDATE_ACTION: 'companies/address/',
+
+    // documents
     COMPANIES_DOCUMENTS_VIEW: 'companies/documents/',
+    COMPANIES_DOCUMENTS_UPDATE_ACTION: 'companies/documents/',
+
+    // password
+    COMPANIES_PASSWORD_VIEW: 'companies/password/',
+    COMPANIES_PASSWORD_UPDATE_ACTION: 'companies/password/',
+
+    // email verification
+    COMPANY_EMAIL_VERIFICATION: 'companies/email-verification/',
+
+
 
 
 }

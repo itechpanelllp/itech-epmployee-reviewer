@@ -65,8 +65,8 @@
     "@industryController": "controller/industries",
     "@industryModel": "models/industries",
     "@industryRouter": "router/industries",
-    "@companyController":"controller/companies",
-    "@companyModel":"models/companies",
-    "@companyRouter":"router/companies"
+    "@companyController": "controller/companies",
+    "@companyModel": "models/companies",
+    "@companyRouter": "router/companies"
   }
 }

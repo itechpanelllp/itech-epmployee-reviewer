@@ -62,21 +62,13 @@
 
         //number validation
         $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
-
-
-
         // error remove when key text and change select
         $('#updateCompany').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
-
-
-
-
         // form submit
         $('#updateCompany').submit(function (e) {
             e.preventDefault();
             $('#loader').show();
             $('.errorRemove').text('');
-
             $.post({ url: $(this).attr('action'), data: $(this).serialize() }).done(res => {
                 if (res.errors) {
                     $('#loader').hide();

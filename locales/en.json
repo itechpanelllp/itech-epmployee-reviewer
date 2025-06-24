@@ -235,5 +235,32 @@
 	"Edit Company": "Edit Company",
 	"Company updated successfully": "Company updated successfully",
 	"Edit contact person details": "Edit contact person details",
-	"Conatct person updated successfully": "Conatct person updated successfully"
+	"Conatct person updated successfully": "Conatct person updated successfully",
+	"Edit business address": "Edit business address",
+	"Please fill in all visible required address fields before selecting \"Same as Registration Address\".": "Please fill in all visible required address fields before selecting \"Same as Registration Address\".",
+	"Please enter a valid 6-digit Operational Postal Code": "Please enter a valid 6-digit Operational Postal Code",
+	"Business address updated successfully": "Business address updated successfully",
+	"File size must be less than or equal to 2MB.": "File size must be less than or equal to 2MB.",
+	"'The selected image could not be displayed": {
+		" It may be corrupted": {
+			"'": "'The selected image could not be displayed. It may be corrupted.'"
+		}
+	},
+	"Only JPG, PNG, and PDF files are allowed.": "Only JPG, PNG, and PDF files are allowed.",
+	"Contact person updated successfully": "Contact person updated successfully",
+	"Business documents updated successfully": "Business documents updated successfully",
+	"The selected image could not be displayed. It may be corrupted.": "The selected image could not be displayed. It may be corrupted.",
+	"Edit password": "Edit password",
+	"Confirm Password is required": "Confirm Password is required",
+	"Password and confirm password does not match": "Password and confirm password does not match",
+	"Password and Confirm Password does not match": "Password and Confirm Password does not match",
+	"Password updated successfully": "Password updated successfully",
+	" © iTechPanel.": " © iTechPanel.",
+	"Design & Develop by ItechPanel": "Design & Develop by ItechPanel",
+	"Please confirm your email address to complete your registration. Simply click the button below. If you did not initiate this request, you may safely disregard this email.": "Please confirm your email address to complete your registration. Simply click the button below. If you did not initiate this request, you may safely disregard this email.",
+	"Verify email": "Verify email",
+	"Verify your email address": "Verify your email address",
+	"Page not found": "Page not found",
+	"Sorry, page not found": "Sorry, page not found",
+	"Back to Dashboard": "Back to Dashboard"
 }

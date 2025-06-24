@@ -79,7 +79,16 @@
                                 <span id="businessWebsiteError" class="text-danger errorRemove"></span>
                             </div>
                         </div>
-                           <!-- status -->
+                        <!-- password -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label required_field"><%=__("Password") %><span
+                                        class="text-danger"><%=__("*") %></span></label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="<%=__("Password") %>">
+                                <span id="passwordError" class="text-danger errorRemove"></span>
+                            </div>
+                        </div>
+                        <!-- status -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="companyStatus"
@@ -133,7 +142,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="country" class="form-label required_field"><%=__("Country") %><span
                                     class="text-danger"><%=__("*") %></span></label>
-                            <select name="country" id="country" class="form-select country" data-type="reg">
+                            <select name="country" id="countryReg" class="form-select country" data-type="reg" data-placeholder="<%=__("Select Country") %>">
                                 <option value><%=__("Select Country") %></option>
                                 <% country.forEach( item => { %>
                                 <option value="<%= item.id %>"><%= item.name %></option>
@@ -189,7 +198,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="country" class="form-label required_field"><%=__("Country") %><span
                                         class="text-danger"><%=__("*") %></span></label>
-                                <select name="operationalCountry" id="country" class="form-select country" data-type="op">
+                                <select name="operationalCountry" id="countryOp" class="form-select country" data-type="op" data-placeholder="<%=__("Select Country") %> ">
                                     <option value><%=__("Select Country") %></option>
                                     <% country.forEach( item => { %>
                                     <option value="<%= item.id %>"><%= item.name %></option>
@@ -350,7 +359,7 @@ $(document).on('change', '.doc-upload', function () {
   const validPdfType = 'application/pdf';
 
   if (fileSizeMB > 2) {
-    errorSpan.text('File size must be less than or equal to 2MB.');
+   errorSpan.text(`<%=__("File size must be less than or equal to 2MB.") %>`);
     $(fileInput).val('');
     return;
   }
@@ -358,16 +367,14 @@ $(document).on('change', '.doc-upload', function () {
   if (validImageTypes.includes(fileType)) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      // Validate image visibility by loading in memory
       const img = new Image();
       img.onload = function () {
-        // If successfully loaded
         previewImg.attr('src', e.target.result).show();
         previewText.hide();
         previewBox.removeClass('d-none');
       };
       img.onerror = function () {
-        errorSpan.text('The selected image could not be displayed. It may be corrupted.');
+        errorSpan.text(`<%=__("'The selected image could not be displayed. It may be corrupted.'") %>`);
         $(fileInput).val('');
       };
       img.src = e.target.result;
@@ -378,7 +385,7 @@ $(document).on('change', '.doc-upload', function () {
     previewText.text(`📄 ${fileName}`).show();
     previewBox.removeClass('d-none');
   } else {
-    errorSpan.text('Only JPG, PNG, and PDF files are allowed.');
+    errorSpan.text(`<%=__("Only JPG, PNG, and PDF files are allowed.") %>`);
     $(fileInput).val('');
   }
 });
@@ -395,10 +402,6 @@ $(document).on('click', '.btn-close-preview', function () {
   fileInput.siblings('span.text-danger').text('');
 });
 </script>
-
-
-
-
 <script>
     $(document).ready(function () {
         $(setTimeout(() => $('#loader').hide(), 300));
@@ -438,33 +441,41 @@ $(document).on('click', '.btn-close-preview', function () {
         const $city = $(`.city[data-type="${type}"]`);
         const $stateWrapper = $state.closest('.state-wrapper');
         const $cityWrapper = $city.closest('.city-wrapper');
-
+        // Reset and disable city
+        $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+        $city.prop('disabled', true);
+        $cityWrapper.removeClass('d-none');
         $.post(`<%= base_url + get_state %>`, { country: countryId }, res => {
             const states = res.state || [];
-            $state.html(states.map((s, i) => `<option value="${s.id}" ${i === 0 ? 'selected' : ''}>${s.name}</option>`).join(''));
-
+              let stateOptions = `<option value="">${"<%= __('Select State') %>"}</option>`;
+                if (states.length > 0) {
+                    states.forEach(s => {
+                        stateOptions += `<option value="${s.id}">${s.name}</option>`;
+                    });
+                }
+             $state.html(stateOptions);
             if (states.length === 0) {
                 $stateWrapper.addClass('d-none');
+                $.post(`<%= base_url + get_city %>`, { country: countryId }, res => {
+                    const cities = res.city || [];
+                    let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                    if (cities.length > 0) {
+                        cities.forEach(c => {
+                            cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                        });
+                        $city.html(cityOptions);
+                        $city.prop('disabled', false);
+                        $cityWrapper.removeClass('d-none');
+                        updateHiddenFields();
+                        $city.trigger('citiesLoaded');
+                    }else{
+                        $cityWrapper.addClass('d-none');
+                    }     
+                });
+
             } else {
                 $stateWrapper.removeClass('d-none');
             }
-
-            const stateId = states[0]?.id;
-            const cityPayload = stateId ? { country: countryId, state: stateId } : { country: countryId };
-
-            $.post(`<%= base_url + get_city %>`, cityPayload, res => {
-                const cities = res.city || [];
-                $city.html(cities.map(c => `<option value="${c.id}">${c.name}</option>`).join(''));
-
-                if (cities.length === 0) {
-                    $cityWrapper.addClass('d-none');
-                } else {
-                    $cityWrapper.removeClass('d-none');
-                }
-
-                updateHiddenFields();
-                $city.trigger('citiesLoaded'); // ✅ Important
-            });
         });
     });
 
@@ -477,25 +488,32 @@ $(document).on('click', '.btn-close-preview', function () {
         const $cityWrapper = $city.closest('.city-wrapper');
 
         if (!stateId) {
+            $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
             $cityWrapper.addClass('d-none');
             updateHiddenFields();
             return;
         }
 
         $cityWrapper.removeClass('d-none');
+        $city.prop('disabled', true);
 
         $.post(`<%= base_url + get_city %>`, { country: countryId, state: stateId }, res => {
             const cities = res.city || [];
-            $city.html(cities.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '');
+            let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+            if (cities.length > 0) {
+                cities.forEach(c => {
+                    cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                });
+            }
+            $city.html(cityOptions);
+            $city.prop('disabled', false);
 
             if (cities.length === 0) {
                 $cityWrapper.addClass('d-none');
-            } else {
-                $cityWrapper.removeClass('d-none');
             }
 
             updateHiddenFields();
-            $city.trigger('citiesLoaded'); // ✅ Important
+            $city.trigger('citiesLoaded');
         });
     });
 
@@ -526,22 +544,14 @@ $(document).on('click', '.btn-close-preview', function () {
                 $(this).prop('checked', false);
                 return;
             }
-
-            // Copy country and trigger change
             $opCountry.val($regCountry.val()).trigger('change');
-
-            // Wait for state dropdown to populate
             setTimeout(() => {
                 $opState.val($regState.val()).trigger('change');
-
-                // ✅ Wait for city options to load after state is set
                 $opCity.one('citiesLoaded', function () {
                     $opCity.val($regCity.val());
                 });
 
             }, 300);
-
-            // Show operational fields (if hidden)
             $opState.closest('.state-wrapper').removeClass('d-none');
             $opCity.closest('.city-wrapper').removeClass('d-none');
 

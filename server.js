@@ -59,6 +59,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Global 404 Error Handler
+app.use((req, res) => {
+    res.status(404).render('pageNotFound');
+});
+
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });
