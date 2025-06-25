@@ -8,8 +8,8 @@ const { checkPermissionEJS } = require('@middleware/checkPermission');
 const editContactPersonView = async (req, res) => {
     try {
         let id = req.params.id;
-        const result = await companyModel.companyData(id);
-        if (!result) {
+        const data = await companyModel.companyData(id);
+        if (!data) {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
         const urls = {
@@ -19,6 +19,7 @@ const editContactPersonView = async (req, res) => {
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
+        data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;
         const updatePer = await checkPermissionEJS('companies', 'update', req);
 
         res.render('companies/editCompany/contactDetails', {
@@ -26,7 +27,7 @@ const editContactPersonView = async (req, res) => {
             session: req.session,
             updatePer,
             urls,
-            data: result,
+            data,
             update_company: companyPath.COMPANIES_CONTACT_INFO_UPDATE_ACTION + id,
             currentPage: 'contact_info',
 

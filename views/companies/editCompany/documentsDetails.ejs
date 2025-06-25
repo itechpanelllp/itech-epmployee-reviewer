@@ -38,18 +38,20 @@
                             const fileName = path.split('/').pop();
                             const isPdf = fileName?.toLowerCase().endsWith('.pdf');
                             const url = path ? base_url + img_url + path : '';
-                            return { path, fileName, isPdf, url };
+                            const docId = doc?.id || '';
+                            const status = doc?.status || '';
+                            return { path, fileName, isPdf, url, docId, status };
                             };
-
+                           
                             const gst = getFileMeta('gstFile');
                             const pan = getFileMeta('panFile');
                             const aadhaarFront = getFileMeta('aadhaarFrontFile');
                             const aadhaarBack = getFileMeta('aadhaarBackFile');
                             const webLogo = {
-                            path: data.logo || '',
-                            fileName: (data.logo || '').split('/').pop(),
-                            isPdf: (data.logo || '').toLowerCase().endsWith('.pdf'),
-                            url: data.logo ? base_url + img_url + data.logo : ''
+                                path: data.logo || '',
+                                fileName: (data.logo || '').split('/').pop(),
+                                isPdf: (data.logo || '').toLowerCase().endsWith('.pdf'),
+                                url: data.logo ? base_url + img_url + data.logo : ''
                             };
                             %>
                             <!-- GST Upload -->
@@ -63,10 +65,12 @@
                                     <input type="hidden" name="gstFileOld" value="<%= gst.path %>">
                                     <input type="hidden" class="removeImg" name="removeGSTImg" value="0">
                                 </div>
+                                <% if (gst.status == 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                <% } %>
                                 <span id="gstFileError" class="text-danger errorRemove"></span>
                             </div>
-
-                            <!-- PAN Number -->
                           <!-- PAN Number -->
                             <div class="col-md-6 mb-3">
                                 <label for="panNumber"><%=__("PAN Number") %><span class="text-danger"><%=__("*") %></span></label>
@@ -87,8 +91,12 @@
                                     <% } %>
                                     <button type="button" class="btn-close-preview">×</button>
                                     <input type="hidden" name="panFileOld" value="<%= pan.path %>">
-                                     <input type="hidden" class="removeImg" name="removePanImg" value="0">
+                                    <input type="hidden" class="removeImg" name="removePanImg" value="0">
                                 </div>
+                                <% if (pan.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                <% } %>
                                 <span id="panFileError" class="text-danger errorRemove"></span>
                             </div>
                             <!-- Aadhaar Front Upload -->
@@ -102,6 +110,10 @@
                                     <input type="hidden" name="aadhaarFrontOld" value="<%= aadhaarFront.path %>">
                                     <input type="hidden" class="removeImg" name="removeAdhaarFrontImg" value="0">
                                 </div>
+                                 <% if (aadhaarFront.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= aadhaarFront.docId %>" data-file="Aadhaar Front Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= aadhaarFront.docId %>" data-file="Aadhaar Front Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                <% } %>
                                 <span id="aadhaarFrontError" class="text-danger errorRemove"></span>
                             </div>
 
@@ -116,6 +128,10 @@
                                 <input type="hidden" name="aadhaarBackOld" value="<%= aadhaarBack.path %>">
                                 <input type="hidden" class="removeImg" name="removeAdhaarBackImg" value="0">
                             </div>
+                            <% if (aadhaarBack.status === 'pending') { %>
+                                <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= aadhaarBack.docId %>" data-file="Aadhaar Back Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= aadhaarBack.docId %>" data-file="Aadhaar Back Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                            <% } %>
                             <span id="aadhaarBackError" class="text-danger errorRemove"></span>
                         </div>
 
@@ -144,6 +160,60 @@
     </div>
 </div>
 <%- include('../../common/footer') %>
+<script>
+  $('.action-btn').click(function () {
+    const action = $(this).data('action');
+    const docId = $(this).data('id');
+    const url = $(this).data('url');
+    const file = $(this).data('file');
+    const confirmText = {
+      approved: `<%= __('Are you sure you want to approve this') %> ${file} ?`,
+      rejected: `<%= __('Are you sure you want to reject this') %> ${file} ?`,
+    };
+
+    Swal.fire({
+      title: `<%= __('Are you sure?') %>`,
+      text: confirmText[action] || '',
+      icon: "warning",
+      input: 'textarea',
+      inputLabel: '<%= __("Comment (optional)") %>',
+      inputPlaceholder: '<%= __("Write your reason or comment here...") %>',
+      inputAttributes: {'aria-label': 'Comment'},
+      showCancelButton: true,
+      confirmButtonText: `<%= __('Yes, proceed!') %>`,
+      cancelButtonText: `<%= __('No, cancel!') %>`,
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger me-2"
+      },
+      buttonsStyling: false,
+      reverseButtons: true
+    }).then(({ isConfirmed, value: comment}) => {
+      if (isConfirmed) {
+        $.post(`${$baseurl}${url}/${docId}`, { action, comment, file }).done(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: `<%= __('Success!') %>`,
+              text: res.success,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: `<%= __('Error') %>`,
+              text: res.error || `<%= __('Something went wrong.') %>`
+            });
+          }
+        });
+      }
+    });
+  });
+
+</script>
 <script>
 $(document).on('change', '.doc-upload', function () {
   const fileInput = this;
@@ -220,7 +290,6 @@ $(document).on('click', '.btn-close-preview', function () {
   previewBox.find('.removeImg').val('1');
 });
 </script>
-
 <script>
     $(document).ready(function () {
         setTimeout(() => $('#loader').hide(), 300);

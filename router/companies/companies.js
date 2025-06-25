@@ -12,9 +12,15 @@ const multerErrorHandler = require('@middleware/multerErrorHandler');
 var uploadprofile = upload(`./public/uploads/companies/${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`).fields([
     { name: 'gstFile', maxCount: 1 },
     { name: 'panFile', maxCount: 1 },
-    { name: 'aadhaarFront', maxCount: 1 },
-    { name: 'aadhaarBack', maxCount: 1 },
-    { name: 'websiteLogo', maxCount: 1 },
+    { name: 'companyLogo', maxCount: 1 },
+    { name: 'aadhaarCard_front', maxCount: 1 },
+    { name: 'aadhaarCard_back', maxCount: 1 },
+    { name: 'voterID_front', maxCount: 1 },
+    { name: 'voterID_back', maxCount: 1 },
+    { name: 'passport_front', maxCount: 1 },
+    { name: 'passport_back', maxCount: 1 },
+    { name: 'drivingLicence_front', maxCount: 1 },
+    { name: 'drivingLicence_back', maxCount: 1 },
 ]);
 
 const uploadWithErrorHandler = multerErrorHandler(uploadprofile);

@@ -12,8 +12,8 @@ let uploadprofile = `companies/${now.getFullYear()}/${now.getMonth() + 1}/${now.
 const editDocumentsView = async (req, res) => {
     try {
         let id = req.params.id;
-        const result = await companyModel.companyData(id);
-        if (!result) {
+        const data = await companyModel.companyData(id);
+        if (!data) {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
         const urls = {
@@ -23,6 +23,7 @@ const editDocumentsView = async (req, res) => {
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
+        data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;
         const updatePer = await checkPermissionEJS('companies', 'update', req);
 
         const documents = await companyModel.getDocuments(id);
@@ -32,10 +33,11 @@ const editDocumentsView = async (req, res) => {
             session: req.session,
             updatePer,
             urls,
-            data: result,
+            data,
             documents,
             img_url,
             update_documents: companyPath.COMPANIES_DOCUMENTS_UPDATE_ACTION + id,
+            update_documents_status: companyPath.COMPANIES_DOCUMENTS_STATUS_UPDATE_ACTION + id,
             currentPage: 'documents',
 
         })
@@ -128,9 +130,37 @@ const updateDocumentsAction = async (req, res) => {
     }
 };
 
+// documents status update action
+const updateDocumentsStatusAction = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const docId = req.params.docId;
+        const { action, comment, file } = req.body;
+        const result = await companyModel.updateDocumentsStatus(id, docId, action);
+
+        const normalizedFileKey = file.toLowerCase().replace(/\s+/g, '_');
+        if (comment && comment.trim() !== '') {
+            const data = {
+                company_id: id,
+                meta_key: `${normalizedFileKey}_comment`,
+                meta_value: comment.trim(),
+            }
+            await companyModel.insertComment(data);
+        }
+        if (result) {
+            await userActivityLog(req, req.session.userId, companyPath.COMPANIES_DOCUMENTS_STATUS_UPDATE_ACTION + id, "Documents status updated successfully", "UPDATE");
+            return res.status(200).json({ success: res.__("Documents status updated successfully") });
+        }
+        return res.status(200).json({ error: res.__("Something went wrong, please try again") });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 
 
 module.exports = {
     editDocumentsView,
-    updateDocumentsAction
+    updateDocumentsAction,
+    updateDocumentsStatusAction
 }

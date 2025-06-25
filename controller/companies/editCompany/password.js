@@ -8,8 +8,8 @@ const bcrypt = require('bcrypt');
 const editPasswordView = async (req, res) => {
     try {
         let id = req.params.id;
-        const result = await companyModel.companyData(id);
-        if (!result) {
+        const data = await companyModel.companyData(id);
+        if (!data) {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
         const urls = {
@@ -19,6 +19,7 @@ const editPasswordView = async (req, res) => {
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
+         data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;
         const updatePer = await checkPermissionEJS('companies', 'update', req);
 
         res.render('companies/editCompany/password', {
@@ -26,7 +27,7 @@ const editPasswordView = async (req, res) => {
             session: req.session,
             updatePer,
             urls,
-            data: result,
+            data,
             update_password: companyPath.COMPANIES_PASSWORD_UPDATE_ACTION + id,
             currentPage: 'password',
 

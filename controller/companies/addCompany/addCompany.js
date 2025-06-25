@@ -15,6 +15,8 @@ const addCompanyView = async (req, res) => {
         const companyType = await companyModel.getCompanyType();
         const country = await companyModel.getCountry();
         const employeeStrength = await companyModel.getEmployeeStrength();
+        const documentType = await companyModel.getDocumentType();
+
         res.render('companies/addCompany/addCompany', {
             title: res.__("Add Company"),
             session: req.session,
@@ -22,6 +24,7 @@ const addCompanyView = async (req, res) => {
             companyType,
             country,
             employeeStrength,
+            documentType,
             add_company: companyPath.COMPANIES_ADD_ACTION,
             get_state: companyPath.COMPANIES_STATE_ACTION,
             get_city: companyPath.COMPANIES_CITY_ACTION,
@@ -35,33 +38,24 @@ const addCompanyView = async (req, res) => {
 // add company action
 const addCompanyAction = async (req, res) => {
     try {
+        const {
+            businessType, businessName, businessEmail, businessPhone,
+            employeeStrength, businessWebsite, password, contactPersonName,
+            contactPersonEmail, contactPersonPhone, country, state, city,
+            address, postalCode, operationalCountry, operationalState,
+            operationalCity, operationalAddress, operationalPostalCode,
+            companyStatus, sameAddress,
+            company = {}
+        } = req.body;
 
-        const { businessType, businessName, businessEmail, businessPhone, employeeStrength, businessWebsite, password, contactPersonName, contactPersonEmail, contactPersonPhone, country, state, city, address, postalCode, operationalCountry, operationalState, operationalCity, operationalAddress, operationalPostalCode, companyStatus, sameAddress, company: { tanNumberCheck, tanNumber, gstNumber, panNumber } = {} } = req.body;
-        const getFile = (key) => req.files?.[key]?.[0]?.filename || '';
+        const getFile = key => req.files?.[key]?.[0]?.filename || '';
+        const logo = getFile('logo');
 
-        const logo = getFile('websiteLogo');
-        const gstFile = getFile('gstFile');
-        const panFile = getFile('panFile');
-        const aadhaarFront = getFile('aadhaarFront');
-        const aadhaarBack = getFile('aadhaarBack');
-        // Check required files
-        const missingFiles = [];
-        if (!gstFile) missingFiles.push('GST file');
-        if (!panFile) missingFiles.push('PAN file');
-        if (!aadhaarFront) missingFiles.push('Aadhaar front image');
-        if (!aadhaarBack) missingFiles.push('Aadhaar back image');
-
-        if (missingFiles.length > 0) {
-            return res.status(200).json({
-                error: `Missing required document(s): ${missingFiles.join(', ')}`
-            });
-        }
-        let isCompanyExists = await companyModel.checkCompanyName(businessEmail);
-        if (isCompanyExists) {
+        if (await companyModel.checkCompanyName(businessEmail)) {
             return res.status(200).json({ error: 'Company name already exists' });
         }
 
-        const companyData = {
+        const companyId = await companyModel.addCompany({
             company_type_id: businessType,
             business_name: businessName,
             business_email: businessEmail,
@@ -74,96 +68,99 @@ const addCompanyAction = async (req, res) => {
             status: companyStatus,
             logo: `${uploadprofile}/${logo}`,
             password: await bcrypt.hash(password, 10),
-        }
+        });
 
-        const companyId = await companyModel.addCompany(companyData);
-        if (!companyId) {
-            return res.status(500).json({ error: 'Failed to add company, please try again' });
-        }
-
-        const companyAddress = {
+        const addressData = (type, c, s, ct, a, p) => ({
             company_id: companyId,
-            is_same_address: sameAddress ? sameAddress == 'on' ? 1 : '' : '',
-            type: 'registered',
-            country: country,
-            state: state,
-            city: city,
-            address: address,
-            postal_code: postalCode
-        }
+            type, country: c, state: s, city: ct, address: a,
+            postal_code: p,
+            is_same_address: sameAddress === 'on' ? 1 : ''
+        });
 
+        await companyModel.addAddress(addressData('registered', country, state, city, address, postalCode));
+        await companyModel.addAddress(addressData('operational', operationalCountry, operationalState, operationalCity, operationalAddress, operationalPostalCode));
 
-        const companyAddressResult = await companyModel.addAddress(companyAddress);
-        const companyOperationalAddress = {
-            company_id: companyId,
-            is_same_address: sameAddress ? sameAddress == 'on' ? 1 : '' : '',
-            type: 'operational',
-            country: operationalCountry,
-            state: operationalState,
-            city: operationalCity,
-            address: operationalAddress,
-            postal_code: operationalPostalCode
-        }
-        const companyOpAddressResult = await companyModel.addAddress(companyOperationalAddress);
-        // Save documents
         const docs = [
-            { key: 'gstNumber', value: gstNumber, fileKey: 'gstFile', file: gstFile },
-            { key: 'panNumber', value: panNumber, fileKey: 'panFile', file: panFile },
-            { key: 'aadhaarFront', value: '', fileKey: 'aadhaarFrontFile', file: aadhaarFront },
-            { key: 'aadhaarBack', value: '', fileKey: 'aadhaarBackFile', file: aadhaarBack },
+            { key: 'panNumber', value: company.panNumber, file: getFile('panFile'), fileKey: 'panFile' },
+            ...(company.tanNumberCheck === 'on' ? [{ key: 'tanNumber', value: company.tanNumber }, { key: 'tanNumberCheck', value: 'on' }] : []),
+            ...(company.gstCheck === 'on' ? [
+                { key: 'gstCheck', value: 'on' },
+                { key: 'gstNumber', value: company.gstNumber },
+                { key: 'gstFile', file: getFile('gstFile'), fileKey: 'gstFile' }
+            ] : [])
         ];
-        if (tanNumberCheck == 'on') {
-            docs.push(
-                { key: 'tanNumberCheck', value: 'on', file: '' },
-                { key: 'tanNumber', value: tanNumber, file: '' }
-            );
-        }
 
+        const insertedKeys = new Set();
+
+        // Insert static documents and their files
         for (const doc of docs) {
-            if (doc.value) {
+            if (doc.value && !insertedKeys.has(doc.key)) {
                 await companyModel.addDocument({
                     company_id: companyId,
                     meta_key: doc.key,
                     meta_value: doc.value
                 });
+                insertedKeys.add(doc.key);
             }
-            if (doc.file) {
+
+            if (doc.file && !insertedKeys.has(doc.fileKey || `${doc.key}File`)) {
                 await companyModel.addDocument({
                     company_id: companyId,
                     meta_key: doc.fileKey || `${doc.key}File`,
                     meta_value: `${uploadprofile}/${doc.file}`
                 });
+                insertedKeys.add(doc.fileKey || `${doc.key}File`);
             }
-
         }
-        // send email
+
+        // Insert Aadhaar/Voter files (dynamic doc files)
+        for (const fileKey in req.files || {}) {
+            if (/_(front|back)$/.test(fileKey) && !insertedKeys.has(fileKey)) {
+                const file = req.files[fileKey][0].filename;
+                await companyModel.addDocument({
+                    company_id: companyId,
+                    meta_key: fileKey,
+                    meta_value: `${uploadprofile}/${file}`
+                });
+                insertedKeys.add(fileKey);
+            }
+        }
+
+        // Insert dynamic document numbers (e.g., AadhaarCard_number, VoterID_number)
+        for (const [key, value] of Object.entries(company)) {
+            if (/_number$/i.test(key) && !insertedKeys.has(key)) {
+                await companyModel.addDocument({
+                    company_id: companyId,
+                    meta_key: key,
+                    meta_value: value
+                });
+                insertedKeys.add(key);
+            }
+        }
+
+
         const token = jwt.sign({ id: companyId }, JWT_SECRET);
         await companyModel.addEmailVerificationToken(companyId, token);
 
-        const emailVerifylink = `${base_url}${companyPath.COMPANY_EMAIL_VERIFICATION}/${token}`;
-console.log(emailVerifylink);
-
-        const emailVerification = {
+        await emailVerificationMail({
             name: businessName,
             message: res.__("Please confirm your email address to complete your registration. Simply click the button below. If you did not initiate this request, you may safely disregard this email."),
-            link: emailVerifylink,
+            link: `${base_url}${companyPath.COMPANY_EMAIL_VERIFICATION}${token}`,
             button_text: res.__("Verify email"),
             footer: res.__("Thanks"),
             support_team: res.__("The Support Teams"),
             email: businessEmail,
             subject: res.__("Verify your email address")
-        };
-        console.log(emailVerification);
-        
-        emailVerificationMail(emailVerification);
+        });
 
-        // Log user activity
         await userActivityLog(req, req.session.userId, companyPath.COMPANIES_ADD_ACTION, "Company added successfully", "Add");
 
-        return res.status(200).json({ success: req.__('Company added successfully') });
-    } catch (error) {
-        return res.status(500).json({ error: error.message });
+       return res.status(200).json({ success: req.__('Company added successfully') });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-}
+};
+
 
 module.exports = { addCompanyView, addCompanyAction }

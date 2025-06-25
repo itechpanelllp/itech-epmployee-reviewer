@@ -17,6 +17,7 @@ router.use('/', require('./companies/conatctDetails'));
 router.use('/', require('./companies/addressDetails'));
 router.use('/', require('./companies/documentsDetails'));
 router.use('/', require('./companies/password'));
+router.use('/', require('./companies/emailVerification'));
 
 
 

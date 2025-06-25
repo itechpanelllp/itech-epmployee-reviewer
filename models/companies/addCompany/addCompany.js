@@ -4,7 +4,11 @@ const db = require('@config/db');
 module.exports = {
     // get company type
     getCompanyType: async () => {
-        const result = await db.query(`SELECT id, name FROM ${companyTables.company_types}`);
+        const result = await db.query(`SELECT id, name FROM ${companyTables.company_types} WHERE status = 'active'`);
+        return result || '';
+    },
+    getDocumentType: async () => {
+        const result = await db.query(`SELECT id, name, side FROM ${companyTables.government_id_documents} WHERE status = 'active'`);
         return result || '';
     },
     getCountry: async () => {

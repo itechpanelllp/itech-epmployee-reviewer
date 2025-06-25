@@ -4,6 +4,7 @@
     <div class="tab-content text-muted mt-4 mt-md-0">
         <div class="card">
             <div class="card-body p-4">
+                <%= console.log(documentType) %>
                 <form id="addCompany" action="<%= base_url + add_company %>" enctype="multipart/form-data">
                     <div class="row">
                         <!-- business type -->
@@ -15,7 +16,7 @@
                                 <select name="businessType" id="businessType" class="form-select">
                                     <option value><%=__("Select business type") %></option>
                                     <% companyType.forEach( item => { %>
-                                    <option value="<%= item.id %>"><%= item.name %></option>
+                                    <option value="<%= item.id %>" data-type="<%= item.name %>"><%= item.name %></option>
                                     <% }) %>
                                 </select>
                                 <span id="businessTypeError" class="text-danger errorRemove"></span>
@@ -246,7 +247,7 @@
                         </div>
                         <span class="mb-3"> <h5><%=__("Business documents") %></h5></span>
                         <!-- tan number -->
-                        <div class="form-check mb-3">
+                        <div class="col-md-6 form-check mb-3">
                             <input type="checkbox" name="company[tanNumberCheck]" id="tanNumberCheck">
                             <label class="form-check-label" for="tanNumberCheck"><%=__("TAN Number") %></label>
                         </div>
@@ -256,17 +257,40 @@
                                 placeholder="<%=__("TAN Number") %>" value="">
                             <span id="tanNumberError" class="text-danger errorRemove"></span>
                         </div>
+                      
                     </div>
-                    <div class="row">    
+                    <div class="row"> 
+                        <!-- goverment id -->
+                        <div class="col-md-6 mb-3">
+                            <label for="govermentDoc"
+                                class="form-label required_field"><%=__("Government Approved Identification Documents") %><span
+                                    class="text-danger"><%=__("*") %></span></label>
+                            <select name="company[govermentDoc]" id="govermentDoc" class="form-select govermentDoc">
+                                <option value><%=__("Select government authority documents") %></option>
+                                <% if(documentType && documentType.length > 0) {%>
+                                    <% documentType.forEach( item => { 
+                                        let typeKey = item.name.replace(/\s/g, '');%>
+                                    <option value="<%= item.id %>"  data-type="<%= typeKey %>" data-name="<%= typeKey %>_number" data-label="<%= item.name %>"  data-side="<%= item.side %>"><%= item.name %></option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                            <span id="govermentDocError" class="text-danger errorRemove"></span>
+                        </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="company[gstCheck]" id="gstCheck">
+                        <label class="form-check-label" for="gstCheck"><%=__("I have GST Number") %></label>
+                    </div>
+                    <div class="row gstDoc d-none">
                         <!-- GST Number -->
                         <div class="col-md-6 mb-3">
                             <label for="gstNumber"><%=__("GST Number") %><span class="text-danger"><%=__("*") %></span></label>
                             <input type="text" id="gstNumber" name="company[gstNumber]" class="form-control" placeholder="Enter GST Number">
-                             <span id="company_gstNumberError" class="text-danger errorRemove"></span>
+                            <span id="company_gstNumberError" class="text-danger errorRemove"></span>
                         </div>
-                         <!-- GST Upload -->
+                        <!-- GST Upload -->
                         <div class="col-md-6 mb-3">
-                            <label for="gstNumber"><%=__("GST Document") %></label>
+                            <label for="gstNumber"><%=__("GST Document") %><span class="text-danger"><%=__("*") %></span></label>
                             <input type="file" class="form-control doc-upload" data-preview="#gstPreview" name="gstFile">
                             <div class="img-preview d-none" id="gstPreview">
                                 <img src="" class="img-thumbnail" />
@@ -275,6 +299,8 @@
                             </div>
                             <span id="gstFileError" class="text-danger errorRemove"></span>
                         </div>
+                    </div>
+                    <div class="row">    
                         <!-- PAN Number -->
                         <div class="col-md-6 mb-3">
                             <label for="panNumber"><%=__("PAN Number") %><span class="text-danger"><%=__("*") %></span></label>
@@ -283,7 +309,7 @@
                         </div>
                         <!-- PAN Upload -->
                         <div class="col-md-6 mb-3">
-                            <label for="panNumber"><%=__("PAN Document") %></label>
+                            <label for="panNumber"><%=__("PAN Document") %><span class="text-danger"><%=__("*") %></span></label>
                             <input type="file" class="form-control doc-upload" data-preview="#panPreview" name="panFile">
                             <div class="img-preview d-none" id="panPreview">
                                 <img src="" class="img-thumbnail" />
@@ -292,41 +318,22 @@
                             </div>
                                <span id="panFileError" class="text-danger errorRemove"></span>
                         </div>
-                        <!-- Aadhaar Front Upload -->
+                         <!-- Company logo -->
                         <div class="col-md-6 mb-3">
-                            <label><%=__("Aadhaar Card (Front)") %><span class="text-danger"><%=__("*") %></span></label>
-                            <input type="file" class="form-control doc-upload" data-preview="#aadhaarFrontPreview" name="aadhaarFront">
-                            <div class="img-preview d-none" id="aadhaarFrontPreview">
+                            <label><%=__("Company Logo") %></label>
+                            <input type="file" class="form-control doc-upload" data-preview="#companyLogoPreview"
+                                name="companyLogo" id="companyLogo">
+                            <div class="img-preview d-none" id="companyLogoPreview">
                                 <img src="" class="img-thumbnail" />
                                 <div class="file-info"></div>
                                 <button type="button" class="btn-close-preview">×</button>
                             </div>
                         </div>
-                        <!-- Aadhaar Back Upload -->
-                        <div class="col-md-6 mb-3">
-                            <label><%=__("Aadhaar Card (Back)") %><span class="text-danger"><%=__("*") %></span></label>
-                            <input type="file" class="form-control doc-upload" data-preview="#aadhaarBackPreview"
-                                name="aadhaarBack">
-                            <div class="img-preview d-none" id="aadhaarBackPreview">
-                                <img src="" class="img-thumbnail" />
-                                <div class="file-info"></div>
-                                <button type="button" class="btn-close-preview">×</button>
-                            </div>
-                        </div>
-                         <!-- website logo -->
-                        <div class="col-md-6 mb-3">
-                            <label><%=__("Website Logo") %></label>
-                            <input type="file" class="form-control doc-upload" data-preview="#websiteLogoPreview"
-                                name="websiteLogo" id="websiteLogo">
-                            <div class="img-preview d-none" id="websiteLogoPreview">
-                                <img src="" class="img-thumbnail" />
-                                <div class="file-info"></div>
-                                <button type="button" class="btn-close-preview">×</button>
-                            </div>
-                        </div>
-                        <input type="hidden" name="hiddenFields" id="hiddenFieldsInput" />
-
                     </div>
+                    <!-- insert custom fileds -->
+                    <div class="row dynamicDocFields"></div>
+                    
+                    <input type="hidden" name="hiddenFields" id="hiddenFieldsInput" />
                 <button type="submit" class="btn btn-primary float-end"><%=__("Submit") %></button>
             </form>
         </div>
@@ -415,168 +422,167 @@ $(document).on('click', '.btn-close-preview', function () {
         // get state
   //number validation
         $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
- 
-    function updateHiddenFields() {
-        const hidden = [];
-        ['state', 'city', 'operationalState', 'operationalCity'].forEach(field => {
-            const $el = $(`#${field}`);
-            const wrapper = $el.closest('.state-wrapper, .city-wrapper, .form-group, .mb-3');
-            if (wrapper.hasClass('d-none') || !$el.is(':visible')) {
-                hidden.push(field);
-            }
-        });
-        $('#hiddenFieldsInput').val(hidden.join(','));
-    }
-
-    function syncOpFields() {
-        $('#operationalAddress').val($('#address').val());
-        $('#operationalPostalCode').val($('#postalCode').val());
-    }
-
-  
-    $(document).on('change', '.country', function () {
-        const type = $(this).data('type');
-        const countryId = $(this).val();
-        const $state = $(`.state[data-type="${type}"]`);
-        const $city = $(`.city[data-type="${type}"]`);
-        const $stateWrapper = $state.closest('.state-wrapper');
-        const $cityWrapper = $city.closest('.city-wrapper');
-        // Reset and disable city
-        $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
-        $city.prop('disabled', true);
-        $cityWrapper.removeClass('d-none');
-        $.post(`<%= base_url + get_state %>`, { country: countryId }, res => {
-            const states = res.state || [];
-              let stateOptions = `<option value="">${"<%= __('Select State') %>"}</option>`;
-                if (states.length > 0) {
-                    states.forEach(s => {
-                        stateOptions += `<option value="${s.id}">${s.name}</option>`;
-                    });
+    
+        function updateHiddenFields() {
+            const hidden = [];
+            ['state', 'city', 'operationalState', 'operationalCity'].forEach(field => {
+                const $el = $(`#${field}`);
+                const wrapper = $el.closest('.state-wrapper, .city-wrapper, .form-group, .mb-3');
+                if (wrapper.hasClass('d-none') || !$el.is(':visible')) {
+                    hidden.push(field);
                 }
-             $state.html(stateOptions);
-            if (states.length === 0) {
-                $stateWrapper.addClass('d-none');
-                $.post(`<%= base_url + get_city %>`, { country: countryId }, res => {
-                    const cities = res.city || [];
-                    let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
-                    if (cities.length > 0) {
-                        cities.forEach(c => {
-                            cityOptions += `<option value="${c.id}">${c.name}</option>`;
-                        });
-                        $city.html(cityOptions);
-                        $city.prop('disabled', false);
-                        $cityWrapper.removeClass('d-none');
-                        updateHiddenFields();
-                        $city.trigger('citiesLoaded');
-                    }else{
-                        $cityWrapper.addClass('d-none');
-                    }     
-                });
-
-            } else {
-                $stateWrapper.removeClass('d-none');
-            }
-        });
-    });
-
-    // State change handler
-    $(document).on('change', '.state', function () {
-        const type = $(this).data('type');
-        const stateId = $(this).val();
-        const countryId = $(`.country[data-type="${type}"]`).val();
-        const $city = $(`.city[data-type="${type}"]`);
-        const $cityWrapper = $city.closest('.city-wrapper');
-
-        if (!stateId) {
-            $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
-            $cityWrapper.addClass('d-none');
-            updateHiddenFields();
-            return;
+            });
+            $('#hiddenFieldsInput').val(hidden.join(','));
         }
 
-        $cityWrapper.removeClass('d-none');
-        $city.prop('disabled', true);
+        function syncOpFields() {
+            $('#operationalAddress').val($('#address').val());
+            $('#operationalPostalCode').val($('#postalCode').val());
+        }
 
-        $.post(`<%= base_url + get_city %>`, { country: countryId, state: stateId }, res => {
-            const cities = res.city || [];
-            let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
-            if (cities.length > 0) {
-                cities.forEach(c => {
-                    cityOptions += `<option value="${c.id}">${c.name}</option>`;
-                });
-            }
-            $city.html(cityOptions);
-            $city.prop('disabled', false);
+    
+        $(document).on('change', '.country', function () {
+            const type = $(this).data('type');
+            const countryId = $(this).val();
+            const $state = $(`.state[data-type="${type}"]`);
+            const $city = $(`.city[data-type="${type}"]`);
+            const $stateWrapper = $state.closest('.state-wrapper');
+            const $cityWrapper = $city.closest('.city-wrapper');
+            // Reset and disable city
+            $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+            $city.prop('disabled', true);
+            $cityWrapper.removeClass('d-none');
+            $.post(`<%= base_url + get_state %>`, { country: countryId }, res => {
+                const states = res.state || [];
+                let stateOptions = `<option value="">${"<%= __('Select State') %>"}</option>`;
+                    if (states.length > 0) {
+                        states.forEach(s => {
+                            stateOptions += `<option value="${s.id}">${s.name}</option>`;
+                        });
+                    }
+                $state.html(stateOptions);
+                if (states.length === 0) {
+                    $stateWrapper.addClass('d-none');
+                    $.post(`<%= base_url + get_city %>`, { country: countryId }, res => {
+                        const cities = res.city || [];
+                        let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                        if (cities.length > 0) {
+                            cities.forEach(c => {
+                                cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                            });
+                            $city.html(cityOptions);
+                            $city.prop('disabled', false);
+                            $cityWrapper.removeClass('d-none');
+                            updateHiddenFields();
+                            $city.trigger('citiesLoaded');
+                        }else{
+                            $cityWrapper.addClass('d-none');
+                        }     
+                    });
 
-            if (cities.length === 0) {
-                $cityWrapper.addClass('d-none');
-            }
-
-            updateHiddenFields();
-            $city.trigger('citiesLoaded');
+                } else {
+                    $stateWrapper.removeClass('d-none');
+                }
+            });
         });
-    });
 
-    // Same as Registration Address handler
-    $('#sameAddress').on('change', function () {
-        const isChecked = this.checked;
-        const get = (type, cls) => $(`.${cls}[data-type="${type}"]`);
-        const $opCountry = get('op', 'country');
-        const $opState = get('op', 'state');
-        const $opCity = get('op', 'city');
-        const $regCountry = get('reg', 'country');
-        const $regState = get('reg', 'state');
-        const $regCity = get('reg', 'city');
-        const $regAddress = $('#address');
-        const $regPostalCode = $('#postalCode');
+        // State change handler
+        $(document).on('change', '.state', function () {
+            const type = $(this).data('type');
+            const stateId = $(this).val();
+            const countryId = $(`.country[data-type="${type}"]`).val();
+            const $city = $(`.city[data-type="${type}"]`);
+            const $cityWrapper = $city.closest('.city-wrapper');
 
-        if (isChecked) {
-            const missingFields = [];
-
-            if ($regCountry.is(':visible') && !$regCountry.val()) missingFields.push('country');
-            if ($regState.is(':visible') && !$regState.val()) missingFields.push('state');
-            if ($regCity.is(':visible') && !$regCity.val()) missingFields.push('city');
-            if ($regAddress.is(':visible') && !$regAddress.val().trim()) missingFields.push('address');
-            if ($regPostalCode.is(':visible') && !$regPostalCode.val().trim()) missingFields.push('postal code');
-
-            if (missingFields.length > 0) {
-                showMsg('Please fill in all visible required address fields before selecting "Same as Registration Address".', 'danger');
-                $(this).prop('checked', false);
+            if (!stateId) {
+                $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+                $cityWrapper.addClass('d-none');
+                updateHiddenFields();
                 return;
             }
-            $opCountry.val($regCountry.val()).trigger('change');
-            setTimeout(() => {
-                $opState.val($regState.val()).trigger('change');
-                $opCity.one('citiesLoaded', function () {
-                    $opCity.val($regCity.val());
-                });
 
-            }, 300);
-            $opState.closest('.state-wrapper').removeClass('d-none');
-            $opCity.closest('.city-wrapper').removeClass('d-none');
+            $cityWrapper.removeClass('d-none');
+            $city.prop('disabled', true);
 
-            $('.operational_address').addClass('d-none');
-            syncOpFields();
-        } else {
-            $('.operational_address').removeClass('d-none');
-        }
+            $.post(`<%= base_url + get_city %>`, { country: countryId, state: stateId }, res => {
+                const cities = res.city || [];
+                let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                if (cities.length > 0) {
+                    cities.forEach(c => {
+                        cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                }
+                $city.html(cityOptions);
+                $city.prop('disabled', false);
 
-        updateHiddenFields();
-    });
+                if (cities.length === 0) {
+                    $cityWrapper.addClass('d-none');
+                }
 
-    // Sync address and postal code if changed
-    $('#address, #postalCode').on('input', function () {
-        if ($('#sameAddress').is(':checked')) {
-            syncOpFields();
-        }
-    });
+                updateHiddenFields();
+                $city.trigger('citiesLoaded');
+            });
+        });
 
+        // Same as Registration Address handler
+        $('#sameAddress').on('change', function () {
+            const isChecked = this.checked;
+            const get = (type, cls) => $(`.${cls}[data-type="${type}"]`);
+            const $opCountry = get('op', 'country');
+            const $opState = get('op', 'state');
+            const $opCity = get('op', 'city');
+            const $regCountry = get('reg', 'country');
+            const $regState = get('reg', 'state');
+            const $regCity = get('reg', 'city');
+            const $regAddress = $('#address');
+            const $regPostalCode = $('#postalCode');
 
+            if (isChecked) {
+                const missingFields = [];
+
+                if ($regCountry.is(':visible') && !$regCountry.val()) missingFields.push('country');
+                if ($regState.is(':visible') && !$regState.val()) missingFields.push('state');
+                if ($regCity.is(':visible') && !$regCity.val()) missingFields.push('city');
+                if ($regAddress.is(':visible') && !$regAddress.val().trim()) missingFields.push('address');
+                if ($regPostalCode.is(':visible') && !$regPostalCode.val().trim()) missingFields.push('postal code');
+
+                if (missingFields.length > 0) {
+                    showMsg('Please fill in all visible required address fields before selecting "Same as Registration Address".', 'danger');
+                    $(this).prop('checked', false);
+                    return;
+                }
+                $opCountry.val($regCountry.val()).trigger('change');
+                setTimeout(() => {
+                    $opState.val($regState.val()).trigger('change');
+                    $opCity.one('citiesLoaded', function () {
+                        $opCity.val($regCity.val());
+                    });
+
+                }, 300);
+                $opState.closest('.state-wrapper').removeClass('d-none');
+                $opCity.closest('.city-wrapper').removeClass('d-none');
+
+                $('.operational_address').addClass('d-none');
+                syncOpFields();
+            } else {
+                $('.operational_address').removeClass('d-none');
+            }
+
+            updateHiddenFields();
+        });
+
+        // Sync address and postal code if changed
+        $('#address, #postalCode').on('input', function () {
+            if ($('#sameAddress').is(':checked')) {
+                syncOpFields();
+            }
+        });
 
         // Form submission
         $('#addCompany').on('input change', 'input, select', function () { $('.errorRemove', this.parentElement).empty(); });
 
         $('#addCompany').on('submit', function (e) {
+            $('#loader').show();
             e.preventDefault();
             $('.errorRemove').empty();
             if ($('#sameAddress').is(':checked')) {
@@ -629,6 +635,51 @@ $(document).on('click', '.btn-close-preview', function () {
         $('#tanNumberCheck').on('change', function () {
             $('.tanNumber').toggleClass('d-none', !this.checked);
         });
+        $('#gstCheck').on('change', function () {
+            $('.gstDoc').toggleClass('d-none', !this.checked);
+        });
+
+        function generateUploadField({ label, name, previewId }) {
+            return `<div class="col-md-6 mb-3"><label>${label}</label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div><button type="button" class="btn-close-preview">×</button></div><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
+        }
+
+        function renderDocumentFields({ docType, docName, docLabel, side }) {
+            $('.document-block').remove();
+             const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
+            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number </label><input type="text" name="company[${docName}]" class="form-control" placeholder="Enter ${docLabel} Number"><span id="company_${docName}Error" class="text-danger errorRemove"></span></div></div>`;
+            let uploadHTML = '';
+            if (side === 'front' || side === 'both') {
+                uploadHTML += generateUploadField({
+                    label: `${docLabel} (Front)`,
+                    name: `${formattedDocType}_front`,
+                    previewId: `${formattedDocType}FrontPreview`
+                });
+            }
+            if (side === 'back' || side === 'both') {
+                uploadHTML += generateUploadField({
+                    label: `${docLabel} (Back)`,
+                    name: `${formattedDocType}_back`,
+                    previewId: `${formattedDocType}BackPreview`
+                });
+            }
+            const $block = $(inputHTML);
+            $block.append(uploadHTML);
+            $('.dynamicDocFields').append($block);
+        }
+
+        // change goverment doc
+        $('.govermentDoc').on('change', function(){
+            const $selected = $(this).find('option:selected');
+            const docType = $selected.data('type');     
+            const docName = $selected.data('name');      
+            const docLabel = $selected.data('label');   
+            const side = $selected.data('side');
+            if (docType && docName && docLabel && side) {
+                renderDocumentFields({ docType, docName, docLabel, side });
+            }else{
+                $('.dynamicDocFields').html('');
+            }  
+        })
 
 
 

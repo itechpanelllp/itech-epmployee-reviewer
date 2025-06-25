@@ -9,8 +9,8 @@ const { checkPermissionEJS } = require('@middleware/checkPermission');
 const editCompanyView = async (req, res) => {
     try {
         let id = req.params.id;
-        const result = await companyModel.companyData(id);
-        if (!result) {
+        const data = await companyModel.companyData(id);
+        if (!data) {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
         const urls = {
@@ -20,6 +20,7 @@ const editCompanyView = async (req, res) => {
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
+        data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;
         const updatePer = await checkPermissionEJS('companies', 'update', req);
         const companyType = await companyModel.getCompanyType();
         const employeeStrength = await companyModel.getEmployeeStrength();
@@ -30,7 +31,7 @@ const editCompanyView = async (req, res) => {
             companyType,
             employeeStrength,
             urls,
-            data: result,
+            data,
             update_company: companyPath.COMPANIES_UPDATE_ACTION + id,
             currentPage: 'business_info',
 
@@ -72,8 +73,33 @@ const updateCompanyAction = async (req, res) => {
     }
 }
 
+// update company approval status
+const updateCompanyApprovalStatus = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { action, comment } = req.body;
+        const result = await companyModel.setCompanyApprovalStatus(id, action);
+        if (!result) return res.status(200).json({ error: res.__("Something went wrong, please try again") });
+        // Save comment if provided
+        if (comment && comment.trim() !== '') {
+            const data = {
+                company_id: id,
+                meta_key: `${action}_comment`,
+                meta_value: comment.trim(),
+            }
+            await companyModel.insertComment(data);
+        }
+        // user activity 
+        await userActivityLog(req, req.session.userId, companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION + id, "Company approval status updated successfully", "UPDATE");
+        return res.status(200).json({ success: res.__("Company approval status updated successfully") });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 
 module.exports = {
     editCompanyView,
-    updateCompanyAction
+    updateCompanyAction,
+    updateCompanyApprovalStatus
 }

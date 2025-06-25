@@ -18,11 +18,14 @@ var uploadprofile = upload(`./public/uploads/companies/${now.getFullYear()}/${no
 
 const uploadWithErrorHandler = multerErrorHandler(uploadprofile);
 
-// contact person edit
+// comapny documents edit
 app.get(`/${path.COMPANIES_DOCUMENTS_VIEW}:id`, checkSession,  checkPermission('companies', 'update'), documentController.editDocumentsView);
 
-// contact person update
+// comapny documents update
 app.post(`/${path.COMPANIES_DOCUMENTS_UPDATE_ACTION}:id`, checkSession, uploadWithErrorHandler, updateDocuments, checkPermission('companies', 'update'), documentController.updateDocumentsAction);
+
+// update company approval status
+app.post(`/${path.COMPANIES_DOCUMENTS_STATUS_UPDATE_ACTION}:id/:docId`, checkSession, checkPermission('companies', 'update'), documentController.updateDocumentsStatusAction);
 
 
 module.exports = app;

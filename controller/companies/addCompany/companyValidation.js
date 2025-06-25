@@ -44,9 +44,14 @@ const companiesValidation = [
     requiredUnlessHidden('operationalCity', 'Operational City is required'),
     body('operationalAddress').notEmpty().withMessage((_, { req }) => req.__('Operational Address is required')),
     body('operationalPostalCode').notEmpty().withMessage((_, { req }) => req.__('Operational Address Postal Code is required')).bail().matches(/^[1-9][0-9]{5}$/).withMessage((_, { req }) => req.__('Please enter a valid 6-digit Operational Postal Code')),
-    body('company[gstNumber]').notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
-    body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
+    body('company[gstNumber]').if((value, { req }) => req.body.company?.gstCheck).notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).bail().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
+    body('gstFile').if((value, { req }) => req.body.company?.gstCheck).custom((value, { req }) => { if (!req.files || !req.files.gstFile) { throw new Error(req.__('GST Document is required')); } return true; }),
+    body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).bail().matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
+    body('panFile').custom((value, { req }) => { if (!req.files || !req.files.panFile) { throw new Error(req.__('PAN Document is required')); } return true; }),
+    //    body('aadhaarFront').custom((value, { req }) => { if (!req.files || !req.files.aadhaarFront) { throw new Error(req.__('Aadhaar Front Document is required')); } return true; }),
+    //    body('aadhaarBack').custom((value, { req }) => { if (!req.files || !req.files.aadhaarBack) { throw new Error(req.__('Aadhaar Back Document is required')); } return true; }),
     body('businessWebsite').optional({ checkFalsy: true }).isURL({ require_protocol: true }).withMessage((_, { req }) => req.__('Please enter a valid website URL format')),
+    body('company[govermentDoc]').notEmpty().withMessage((_, { req }) => req.__('Goverment Document is required')),
 
     validationHandler
 ];
@@ -83,8 +88,8 @@ const updateAddress = [
 ]
 
 const updateDocuments = [
-    body('company[gstNumber]').notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
-    body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
+    body('company[gstNumber]').notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).bail().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
+    body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).bail().matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
     validationHandler
 ]
 const updatePassword = [

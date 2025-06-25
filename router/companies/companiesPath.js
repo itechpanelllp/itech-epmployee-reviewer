@@ -7,6 +7,7 @@ module.exports = {
 
     COMPANIES_DELETE_ACTION: 'companies/delete/',
     COMPANIES_STATUS_UPDATE_ACTION: 'companies/status/update',
+    COMPANIES_APPROVAL_STATUS_UPDATE_ACTION: 'companies/approval-status/update/',
 
     COMPANIES_STATE_ACTION: 'state',
     COMPANIES_CITY_ACTION: 'city',
@@ -26,6 +27,7 @@ module.exports = {
     // documents
     COMPANIES_DOCUMENTS_VIEW: 'companies/documents/',
     COMPANIES_DOCUMENTS_UPDATE_ACTION: 'companies/documents/',
+    COMPANIES_DOCUMENTS_STATUS_UPDATE_ACTION: 'companies/documents/status/update/',
 
     // password
     COMPANIES_PASSWORD_VIEW: 'companies/password/',
@@ -33,6 +35,7 @@ module.exports = {
 
     // email verification
     COMPANY_EMAIL_VERIFICATION: 'companies/email-verification/',
+   
 
 
 

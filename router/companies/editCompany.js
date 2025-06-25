@@ -13,5 +13,10 @@ app.get(`/${path.COMPANIES_EDIT_VIEW}:id`, checkSession,  checkPermission('compa
 // companies update
 app.post(`/${path.COMPANIES_UPDATE_ACTION}:id`, checkSession, updateCompany, checkPermission('companies', 'update'), editCompanyController.updateCompanyAction);
 
+// update company approval status
+app.post(`/${path.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION}:id`, checkSession, checkPermission('companies', 'update'), editCompanyController.updateCompanyApprovalStatus);
+
+
+
 
 module.exports = app;

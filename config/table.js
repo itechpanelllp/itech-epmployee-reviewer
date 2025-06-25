@@ -16,6 +16,8 @@ module.exports = {
     company_documents:'company_documents',
     company_types:'company_types',
     employee_strength:'employee_strength',
+    company_meta:'company_meta',
+    government_id_documents:'government_id_documents',
   
    
 

@@ -8,8 +8,8 @@ const { checkPermissionEJS } = require('@middleware/checkPermission');
 const editBusinessAddressView = async (req, res) => {
     try {
         let id = req.params.id;
-        const result = await companyModel.companyData(id);
-        if (!result) {
+        const data = await companyModel.companyData(id);
+        if (!data) {
             return res.redirect(`/${companyPath.COMPANIES_LIST_VIEW}`);
         }
         const urls = {
@@ -19,6 +19,7 @@ const editBusinessAddressView = async (req, res) => {
             documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
+        data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;
         const updatePer = await checkPermissionEJS('companies', 'update', req);
         const addressData = await companyModel.getCompanyAddress(id);
         const country = await companyModel.getCountry();
@@ -28,7 +29,7 @@ const editBusinessAddressView = async (req, res) => {
             session: req.session,
             updatePer,
             urls,
-            data: result,
+            data,
             regAddress: addressData.registration || {},
             operAddress: addressData.operational || {},
             country,
@@ -63,7 +64,7 @@ const updateAddressAction = async (req, res) => {
             address: address,
             postal_code: postalCode
         }
-     
+
 
         const companyAddressResult = await companyModel.addAddress(companyAddress);
         const companyOperationalAddress = {
