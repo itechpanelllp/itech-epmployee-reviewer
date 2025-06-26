@@ -298,5 +298,9 @@
 	"Aadhaar Back Document is required": "Aadhaar Back Document is required",
 	"Aadhar Number": "Aadhar Number",
 	"Company Logo": "Company Logo",
-	"Please enter a valid 6-digit Postal Code": "Please enter a valid 6-digit Postal Code"
+	"Please enter a valid 6-digit Postal Code": "Please enter a valid 6-digit Postal Code",
+	"Invalid document type selected": "Invalid document type selected",
+	"Please select a document type": "Please select a document type",
+	"Aadhaar Card number is required": "Aadhaar Card number is required",
+	"Voter ID number is required": "Voter ID number is required"
 }

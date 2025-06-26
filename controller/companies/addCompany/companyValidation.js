@@ -19,8 +19,49 @@ const requiredUnlessHidden = (field, msg) => body(field)
         const hiddenFields = (req.body.hiddenFields || '').split(',');
         if (hiddenFields.includes(field)) return true;
         return val && val.trim() !== '';
-    })
-    .withMessage((_, { req }) => req.__(msg));
+    }).withMessage((_, { req }) => req.__(msg));
+// Custom validator for dynamic documents
+const validateDynamicDocs = (value, { req }) => {
+    const metadataRaw = req.body.selectedDocMeta;
+    if (!metadataRaw) throw new Error(req.__('Missing document metadata'));
+
+    let docMeta;
+    try {
+        docMeta = JSON.parse(metadataRaw);
+    } catch (e) {
+        throw new Error(req.__('Invalid document metadata format'));
+    }
+
+    const { docName, docLabel, docType, side } = docMeta;
+    if (!docName || !docLabel || !side) {
+        throw new Error(req.__('Incomplete document metadata'));
+    }
+
+    const numberField = req.body.company?.[docName];
+
+    if (!numberField || numberField.trim() === '') {
+        const error = new Error(req.__(`${docLabel} number is required`));
+        error.path = `company_${docName}`;
+        throw error;
+    }
+
+    ['front', 'back'].forEach(fileSide => {
+        if (side === fileSide || side === 'both') {
+            const fieldKey = `${docType.charAt(0).toLowerCase() + docType.slice(1)}_${fileSide}`;
+            const fileExists = req.files?.[fieldKey];
+            if (!fileExists) {
+                const fileError = new Error(req.__(`${docLabel} (${fileSide}) document is required`));
+                // 🔥 Set the proper path for file-side errors
+                fileError.path = fieldKey;
+                throw fileError;
+            }
+        }
+    });
+
+    return true;
+};
+
+
 
 // Validation rules
 const companiesValidation = [
@@ -48,11 +89,19 @@ const companiesValidation = [
     body('gstFile').if((value, { req }) => req.body.company?.gstCheck).custom((value, { req }) => { if (!req.files || !req.files.gstFile) { throw new Error(req.__('GST Document is required')); } return true; }),
     body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).bail().matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
     body('panFile').custom((value, { req }) => { if (!req.files || !req.files.panFile) { throw new Error(req.__('PAN Document is required')); } return true; }),
-    //    body('aadhaarFront').custom((value, { req }) => { if (!req.files || !req.files.aadhaarFront) { throw new Error(req.__('Aadhaar Front Document is required')); } return true; }),
-    //    body('aadhaarBack').custom((value, { req }) => { if (!req.files || !req.files.aadhaarBack) { throw new Error(req.__('Aadhaar Back Document is required')); } return true; }),
+
     body('businessWebsite').optional({ checkFalsy: true }).isURL({ require_protocol: true }).withMessage((_, { req }) => req.__('Please enter a valid website URL format')),
     body('company[govermentDoc]').notEmpty().withMessage((_, { req }) => req.__('Goverment Document is required')),
-
+    //  body().custom(validateDynamicDocs),
+    body('companyLogo').optional().custom((value, { req }) => {
+        if (req.files?.companyLogo) {
+            const logo = req.files.companyLogo[0];
+            if (!['image/jpeg', 'image/jpg', 'image/png'].includes(logo.mimetype)) {
+                throw new Error(req.__('Company logo must be a JPEG or PNG image'));
+            }
+        }
+        return true;
+    }),
     validationHandler
 ];
 
@@ -88,8 +137,10 @@ const updateAddress = [
 ]
 
 const updateDocuments = [
-    body('company[gstNumber]').notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).bail().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
+    body('company[gstNumber]').if((value, { req }) => req.body.company?.gstCheck).notEmpty().withMessage((_, { req }) => req.__('GST Number is required')).bail().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage((_, { req }) => req.__('Invalid GST number format')),
+    body('gstFile').if((value, { req }) => req.body.company?.gstCheck).custom((value, { req }) => { if (!req.files || !req.files.gstFile) { throw new Error(req.__('GST Document is required')); } return true; }),
     body('company[panNumber]').notEmpty().withMessage((_, { req }) => req.__('PAN Number is required')).bail().matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/).withMessage((_, { req }) => req.__('Invalid PAN number format')),
+    body('panFile').custom((value, { req }) => { if (!req.files || !req.files.panFile) { throw new Error(req.__('PAN Document is required')); } return true; }),
     validationHandler
 ]
 const updatePassword = [

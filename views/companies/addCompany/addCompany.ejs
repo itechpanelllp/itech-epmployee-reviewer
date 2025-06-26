@@ -4,23 +4,18 @@
     <div class="tab-content text-muted mt-4 mt-md-0">
         <div class="card">
             <div class="card-body p-4">
-                <%= console.log(documentType) %>
                 <form id="addCompany" action="<%= base_url + add_company %>" enctype="multipart/form-data">
                     <div class="row">
                         <!-- business type -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="businessType"
-                                    class="form-label required_field"><%=__("Business Type") %><span
-                                        class="text-danger"><%=__("*") %></span></label>
-                                <select name="businessType" id="businessType" class="form-select">
-                                    <option value><%=__("Select business type") %></option>
-                                    <% companyType.forEach( item => { %>
-                                    <option value="<%= item.id %>" data-type="<%= item.name %>"><%= item.name %></option>
-                                    <% }) %>
-                                </select>
-                                <span id="businessTypeError" class="text-danger errorRemove"></span>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="businessType" class="form-label required_field"><%=__("Business Type") %><span class="text-danger"><%=__("*") %></span></label>
+                            <select name="businessType" id="businessType" class="form-select">
+                                <option value><%=__("Select business type") %></option>
+                                <% companyType.forEach( item => { %>
+                                <option value="<%= item.id %>" data-type="<%= item.name %>"><%= item.name %></option>
+                                <% }) %>
+                            </select>
+                            <span id="businessTypeError" class="text-danger errorRemove"></span>
                         </div>
                         <!-- business name -->
                         <div class="col-md-6">
@@ -257,14 +252,11 @@
                                 placeholder="<%=__("TAN Number") %>" value="">
                             <span id="tanNumberError" class="text-danger errorRemove"></span>
                         </div>
-                      
                     </div>
                     <div class="row"> 
                         <!-- goverment id -->
                         <div class="col-md-6 mb-3">
-                            <label for="govermentDoc"
-                                class="form-label required_field"><%=__("Government Approved Identification Documents") %><span
-                                    class="text-danger"><%=__("*") %></span></label>
+                            <label for="govermentDoc" class="form-label required_field"><%=__("Government Approved Identification Documents") %><span class="text-danger"><%=__("*") %></span></label>
                             <select name="company[govermentDoc]" id="govermentDoc" class="form-select govermentDoc">
                                 <option value><%=__("Select government authority documents") %></option>
                                 <% if(documentType && documentType.length > 0) {%>
@@ -332,8 +324,9 @@
                     </div>
                     <!-- insert custom fileds -->
                     <div class="row dynamicDocFields"></div>
-                    
                     <input type="hidden" name="hiddenFields" id="hiddenFieldsInput" />
+                   
+
                 <button type="submit" class="btn btn-primary float-end"><%=__("Submit") %></button>
             </form>
         </div>
@@ -419,8 +412,7 @@ $(document).on('click', '.btn-close-preview', function () {
             }, 0);
         })
 
-        // get state
-  //number validation
+        //number validation
         $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
     
         function updateHiddenFields() {
@@ -584,7 +576,7 @@ $(document).on('click', '.btn-close-preview', function () {
         $('#addCompany').on('submit', function (e) {
             $('#loader').show();
             e.preventDefault();
-            $('.errorRemove').empty();
+            // $('.errorRemove').empty();
             if ($('#sameAddress').is(':checked')) {
                 const get = (type, cls) => $(`.${cls}[data-type="${type}"]`);
                 get('op', 'country').val(get('reg', 'country').val());
@@ -593,24 +585,56 @@ $(document).on('click', '.btn-close-preview', function () {
                 $('#operationalAddress').val($('#address').val());
                 $('#operationalPostalCode').val($('#postalCode').val());
             }
+            let isValid = true;
+            $('.document-block input[type="text"]').each(function () {
+                const $input = $(this);
+                const name = $input.attr('name');  
+                const value = $input.val().trim();
+                const label = $input.data('label')
+                const errorId = name.replace(/\[|\]/g, '_').replace(/_$/, '') + 'Error';
+                if (!value) {
+                    $(`#${errorId}`).text(`${label} is required.`);
+                    isValid = false;
+                } else if (name.includes('AadhaarCard_number') && !/^[2-9]\d{11}$/.test(value)) {
+                    $(`#${errorId}`).text(`${label} must be a valid 12-digit Aadhaar number (not starting with 0 or 1).`);
+                    isValid = false;
+                }
+
+            });
+            $('.document-block .doc-upload').each(function () {
+                const $input = $(this);
+                const name = $input.attr('name'); 
+                const file = $input[0].files[0];
+                const label = $input.data('label') || 'This file';
+                const errorId = name + 'Error';
+               
+                
+                if (!file) {
+                    $('#' + errorId).text(`${label} is required.`);
+                    isValid = false;
+                }
+            });
+            if (!isValid) {
+                $('#loader').hide();
+                return;
+            }
              updateHiddenFields();
             const formData = new FormData(this);
             $.post({ url: `<%= base_url + add_company %>`, data: formData, contentType: false, processData: false }).done(res => {
+                console.log(res.errors);
+                
                 if (res.errors) {
                     $('#loader').hide();
                     let firstErrorField = null;
                     for (const field in res.errors) {
-                    // Normalize name: company[gstNumber] => company_gstNumber
-                    const normalizedField = field.replace(/\[|\]/g, '_');
-                    const $input = $(this).find(`[name="${field}"]`);
-                    const $error = $(`#${normalizedField}Error`);
-
-                    $error.text(res.errors[field]);
-
-                    if (!firstErrorField && $input.length) {
-                        firstErrorField = $input;
+                        const normalizedField = field.replace(/\[|\]/g, '_');
+                        const $input = $(this).find(`[name="${field}"]`);
+                        const $error = $(`#${normalizedField}Error`);
+                        $error.text(res.errors[field]);
+                        if (!firstErrorField && $input.length) {
+                            firstErrorField = $input;
+                        }
                     }
-                }
 
                 if (firstErrorField) {
                     firstErrorField.focus();
@@ -626,8 +650,7 @@ $(document).on('click', '.btn-close-preview', function () {
         // Toast message
         function showMsg(msg, type = "danger") {
             const toast = $('.toast-container');
-            toast.removeClass('d-none')
-                .find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
             setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
         }
 
@@ -635,18 +658,25 @@ $(document).on('click', '.btn-close-preview', function () {
         $('#tanNumberCheck').on('change', function () {
             $('.tanNumber').toggleClass('d-none', !this.checked);
         });
+        // gst number
         $('#gstCheck').on('change', function () {
-            $('.gstDoc').toggleClass('d-none', !this.checked);
+            const isChecked = this.checked;
+            $('.gstDoc').toggleClass('d-none', !isChecked);
+              if (!isChecked) {
+                $('#gstNumber').val('');
+                $('input[name="gstFile"]').val('');
+                $('#gstPreview').addClass('d-none').find('img').attr('src', '').end().find('.file-info').text('');
+            }
         });
 
         function generateUploadField({ label, name, previewId }) {
-            return `<div class="col-md-6 mb-3"><label>${label}</label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div><button type="button" class="btn-close-preview">×</button></div><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
+            return `<div class="col-md-6 mb-3"><label>${label}<span class="text-danger"><%=__("*") %></span></label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}" data-label="${label}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div><button type="button" class="btn-close-preview">×</button></div><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
         }
 
         function renderDocumentFields({ docType, docName, docLabel, side }) {
             $('.document-block').remove();
              const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
-            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number </label><input type="text" name="company[${docName}]" class="form-control" placeholder="Enter ${docLabel} Number"><span id="company_${docName}Error" class="text-danger errorRemove"></span></div></div>`;
+            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number <span class="text-danger"><%=__("*") %></span> </label><input type="text" name="company[${docName}]" class="form-control" placeholder="Enter ${docLabel} Number" data-label="${docLabel} Number"><span id="company_${docName}Error" class="text-danger errorRemove"></span></div></div>`;
             let uploadHTML = '';
             if (side === 'front' || side === 'both') {
                 uploadHTML += generateUploadField({
@@ -668,18 +698,21 @@ $(document).on('click', '.btn-close-preview', function () {
         }
 
         // change goverment doc
-        $('.govermentDoc').on('change', function(){
+        $('.govermentDoc').on('change', function () {
             const $selected = $(this).find('option:selected');
-            const docType = $selected.data('type');     
-            const docName = $selected.data('name');      
-            const docLabel = $selected.data('label');   
+            const docType = $selected.data('type');
+            const docName = $selected.data('name');
+            const docLabel = $selected.data('label');
             const side = $selected.data('side');
+
             if (docType && docName && docLabel && side) {
+                const metadata = { docType, docName, docLabel, side };
                 renderDocumentFields({ docType, docName, docLabel, side });
-            }else{
+            } else {
                 $('.dynamicDocFields').html('');
-            }  
-        })
+            }
+        });
+
 
 
 

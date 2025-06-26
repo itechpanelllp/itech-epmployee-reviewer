@@ -56,7 +56,6 @@ const updateDocumentsAction = async (req, res) => {
             removeGSTImg, removePanImg, removeAdhaarFrontImg, removeAdhaarBackImg, removeWebsiteLogoImg
         } = req.body;
 
-        // Utility to handle image logic (keep, replace or remove)
         const getImagePath = (fileKey, oldPath, shouldRemove) => {
             const fileObj = req.files?.[fileKey]?.[0];
             if (fileObj) {

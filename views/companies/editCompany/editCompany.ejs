@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-body p-4">
                     <% let updateUrl = updatePer ? base_url + update_company : '' %>
-                    <form action="<%= updateUrl %>" id="updateCompany">
+                    <form action="<%= updateUrl %>" id="updateCompany" enctype="multipart/form-data">
                         <div class="row">
                             <!-- business type -->
                             <div class="col-md-6">
@@ -95,6 +95,134 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="row">
+                            <span class="mb-3"> <h5><%=__("Business documents") %></h5></span>
+                            <!-- tan number -->
+                            <div class="col-md-6 form-check mb-3">
+                                <input type="checkbox" name="company[tanNumberCheck]" id="tanNumberCheck" <%= documents.find(item => item.meta_key === 'tanNumberCheck' && item.meta_value === 'on') ? 'checked' : '' %>>
+                                <label class="form-check-label" for="tanNumberCheck"><%=__("TAN Number") %></label>
+                            </div>
+                            <div class="col-md-6 mb-3 tanNumber <%= documents.find(item => item.meta_key === 'tanNumberCheck' && item.meta_value === 'on') ? '' : 'd-none' %>">
+
+                                <label for="tanNumber" class="form-label"><%=__("TAN Number") %></label>
+                                <input type="text" class="form-control" id="tanNumber" name="company[tanNumber]"
+                                    placeholder="<%=__("TAN Number") %>" value="<%= documents.find(item => item.meta_key == 'tanNumber')?.meta_value  || '' %>">
+                                <span id="tanNumberError" class="text-danger errorRemove"></span>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <!-- goverment id -->
+                            <div class="col-md-6 mb-3">
+                                <label for="govermentDoc" class="form-label required_field"><%=__("Government Approved Identification Documents") %><span class="text-danger"><%=__("*") %></span></label>
+                                <select name="company[govermentDoc]" id="govermentDoc" class="form-select govermentDoc">
+                                    <option value><%=__("Select government authority documents") %></option>
+                                    <% if(documentType && documentType.length > 0) {%>
+                                        <% documentType.forEach( item => { 
+                                            let typeKey = item.name.replace(/\s/g, '');%>
+                                        <option value="<%= item.id %>"  data-type="<%= typeKey %>" data-name="<%= typeKey %>_number" data-label="<%= item.name %>"  data-side="<%= item.side %>"><%= item.name %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                                <input type="hidden" name="oldGovermentDoc" value="<%= documents.find(item => item.meta_key == 'govermentDoc')?.meta_value  || '' %>">
+                                <span id="govermentDocError" class="text-danger errorRemove"></span>
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" name="company[gstCheck]" id="gstCheck" <%= documents.find(item => item.meta_key === 'gstCheck' && item.meta_value === 'on') ? 'checked' : '' %>>
+                            <label class="form-check-label" for="gstCheck"><%=__("I have GST Number") %></label>
+                        </div>
+                        <%      // Helper function for preview logic
+                            const getFileMeta = (key) => {
+                            const doc = documents.find(d => d.meta_key === key);
+                            const path = doc?.meta_value || '';
+                            const fileName = path.split('/').pop();
+                            const isPdf = fileName?.toLowerCase().endsWith('.pdf');
+                            const url = path ? base_url + img_url + path : '';
+                            const docId = doc?.id || '';
+                            const status = doc?.status || '';
+                            return { path, fileName, isPdf, url, docId, status };
+                            };
+                            const gst = getFileMeta('gstFile');
+                            const pan = getFileMeta('panFile');
+                        
+                            const componyLogo = {
+                                path: data.logo || '',
+                                fileName: (data.logo || '').split('/').pop(),
+                                isPdf: (data.logo || '').toLowerCase().endsWith('.pdf'),
+                                url: data.logo ? base_url + img_url + data.logo : ''
+                            };
+                            %>
+                        <div class="row gstDoc <%= documents.find(item => item.meta_key === 'gstCheck' && item.meta_value === 'on') ? '' : 'd-none' %>">
+                            
+                            <!-- GST Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="gstNumber"><%=__("GST Number") %><span class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" id="gstNumber" name="company[gstNumber]" class="form-control" placeholder="Enter GST Number" value="<%= documents.find(item => item.meta_key == 'gstNumber')?.meta_value  || '' %>">
+                                <span id="company_gstNumberError" class="text-danger errorRemove"></span>
+                            </div>
+                            <!-- GST Upload -->
+                            <div class="col-md-6 mb-3">
+                                <label for="gstNumber"><%=__("GST Document") %><span class="text-danger"><%=__("*") %></span></label>
+                                <input type="file" class="form-control doc-upload" data-preview="#gstPreview" name="gstFile">
+                                <div id="gstPreview" class="img-preview <%= gst.path ? '' : 'd-none' %>">
+                                    <img src="<%= gst.isPdf ? '' : gst.url %>" class="img-thumbnail"style="<%= gst.isPdf ? 'display:none;' : 'display:inline;' %>">
+                                    <div class="file-info"style="<%= gst.isPdf ? 'display:block;' : 'display:none;' %>"><%= gst.fileName %></div>
+                                    <button type="button" class="btn-close-preview">×</button>
+                                    <input type="hidden" name="gstFileOld" value="<%= gst.path %>">
+                                    <input type="hidden" class="removeImg" name="removeGSTImg" value="0">
+                                </div>
+                                <% if (gst.status == 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                <% } %>
+                                <span id="gstFileError" class="text-danger errorRemove"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                          <!-- PAN Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="panNumber"><%=__("PAN Number") %><span class="text-danger"><%=__("*") %></span></label>
+                                <input type="text" id="panNumber" name="company[panNumber]" id="panNumber" class="form-control" placeholder="Enter PAN Number" value="<%= documents.find(item => item.meta_key == 'panNumber')?.meta_value  || '' %>">
+                                <span id="company_panNumberError" class="text-danger errorRemove"></span>
+                            </div>
+
+                            <!-- PAN Upload -->
+                            <div class="col-md-6 mb-3">
+                                <label for="panNumber"><%=__("PAN Document") %><span class="text-danger"><%=__("*") %></span></label>
+                                <input type="file" class="form-control doc-upload" data-preview="#panPreview" name="panFile">
+                               <div id="panPreview" class="img-preview <%= pan.path ? '' : 'd-none' %>">
+                                    <% if (pan.isPdf) { %>
+                                    <div class="file-info" style="display: block;"><%= pan.fileName %></div>
+                                    <% } else { %>
+                                    <img src="<%= pan.url %>" class="img-thumbnail" style="display: inline;">
+                                    <div class="file-info" style="display: none;"></div>
+                                    <% } %>
+                                    <button type="button" class="btn-close-preview">×</button>
+                                    <input type="hidden" name="panFileOld" value="<%= pan.path %>">
+                                    <input type="hidden" class="removeImg" name="removePanImg" value="0">
+                                </div>
+                                <% if (pan.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                <% } %>
+                                <span id="panFileError" class="text-danger errorRemove"></span>
+                            </div>
+                          
+                            <!-- Company logo -->
+                        <div class="col-md-6 mb-3">
+                            <label><%=__("Company Logo") %></label>
+                            <input type="file" class="form-control doc-upload" data-preview="#companyLogoPreview" name="companyLogo" id="companyLogo">
+                            <div id="companyLogoPreview" class="img-preview <%= componyLogo.path ? '' : 'd-none' %>">
+                                <img src="<%= componyLogo.isPdf ? '' : componyLogo.url %>" class="img-thumbnail"style="<%= componyLogo.isPdf ? 'display:none;' : 'display:inline;' %>">
+                                <div class="file-info"style="<%= componyLogo.isPdf ? 'display:block;' : 'display:none;' %>"><%= componyLogo.fileName %></div>
+                                <button type="button" class="btn-close-preview">×</button>
+                                <input type="hidden" name="companyLogoOld" value="<%= componyLogo.path %>">
+                                <input type="hidden" class="removeImg" name="removeCompanyLogoImg" value="0">
+                            </div>
+                        </div>
+                        </div>
+                          <!-- insert custom fileds -->
+                        <div class="row dynamicDocFields"></div>
                         <% if(updatePer) { %>
                         <div class="float-end">
                             <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
@@ -107,29 +235,189 @@
     </div>
 </div>
 <%- include('../../common/footer') %>
+<script>
+$(document).on('click', '.action-btn', function () {
+    const action = $(this).data('action');
+    const docId = $(this).data('id');
+    const url = $(this).data('url');
+    const file = $(this).data('file');
+    const confirmText = {
+      approved: `<%= __('Are you sure you want to approve this') %> ${file} ?`,
+      rejected: `<%= __('Are you sure you want to reject this') %> ${file} ?`,
+    };
 
+    Swal.fire({
+      title: `<%= __('Are you sure?') %>`,
+      text: confirmText[action] || '',
+      icon: "warning",
+      input: 'textarea',
+      inputLabel: '<%= __("Comment (optional)") %>',
+      inputPlaceholder: '<%= __("Write your reason or comment here...") %>',
+      inputAttributes: {'aria-label': 'Comment'},
+      showCancelButton: true,
+      confirmButtonText: `<%= __('Yes, proceed!') %>`,
+      cancelButtonText: `<%= __('No, cancel!') %>`,
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger me-2"
+      },
+      buttonsStyling: false,
+      reverseButtons: true
+    }).then(({ isConfirmed, value: comment}) => {
+      if (isConfirmed) {
+        $.post(`${$baseurl}${url}/${docId}`, { action, comment, file }).done(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: `<%= __('Success!') %>`,
+              text: res.success,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: `<%= __('Error') %>`,
+              text: res.error || `<%= __('Something went wrong.') %>`
+            });
+          }
+        });
+      }
+    });
+  });
+
+</script>
+<script>
+$(document).on('change', '.doc-upload', function () {
+  const fileInput = this;
+  const file = fileInput.files[0];
+  const previewId = $(this).data('preview');
+  const previewBox = $(previewId);
+  const previewImg = previewBox.find('img');
+  const previewText = previewBox.find('.file-info');
+  const errorSpan = $(fileInput).siblings('span.text-danger');
+
+  // Reset previous state
+  errorSpan.text('');
+  previewImg.hide().attr('src', '');
+  previewText.text('').hide();
+  previewBox.addClass('d-none');
+
+  if (!file) return;
+
+  const fileType = file.type;
+  const fileSizeMB = file.size / (1024 * 1024); 
+  const fileName = file.name;
+  const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const validPdfType = 'application/pdf';
+
+  if (fileSizeMB > 2) {
+    errorSpan.text(`<%= __("File size must be less than or equal to 2MB.") %>`);
+    $(fileInput).val('');
+    return;
+  }
+
+  if (validImageTypes.includes(fileType)) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        // ✅ Image is valid and loaded
+        previewImg.attr('src', e.target.result).show();
+        previewText.hide();
+        previewBox.removeClass('d-none');
+      };
+      img.onerror = function () {
+        // ❌ Invalid or corrupted image
+        errorSpan.text(`<%= __("The selected image could not be displayed. It may be corrupted.") %>`);
+        $(fileInput).val('');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else if (fileType === validPdfType) {
+    // Show file name for PDF
+    previewImg.hide();
+    previewText.text(fileName).show();
+    previewBox.removeClass('d-none');
+  } else {
+    // Unsupported file type
+    errorSpan.text(`<%= __("Only JPG, PNG, and PDF files are allowed.") %>`);
+    $(fileInput).val('');
+  }
+});
+
+// Clear preview when clicking close button
+$(document).on('click', '.btn-close-preview', function () {
+  const previewBox = $(this).closest('.img-preview');
+  const previewId = previewBox.attr('id');
+  const fileInput = $(`input[data-preview="#${previewId}"]`);
+  const errorSpan = fileInput.siblings('span.text-danger');
+
+  // Reset everything
+  previewBox.addClass('d-none');
+  previewBox.find('img').attr('src', '').hide();
+  previewBox.find('.file-info').text('').hide();
+  fileInput.val('');
+  errorSpan.text('');
+  previewBox.find('.removeImg').val('1');
+});
+</script>
 <script>
     $(document).ready(function () {
         setTimeout(() => $('#loader').hide(), 300);
-
+         let documents = JSON.parse(`<%- JSON.stringify(documents) %>`);
         //number validation
         $(".number_validation").on("input", e => e.target.value = e.target.value.replace(/\D/g, ''));
-
-
-
+        $('#tanNumberCheck').on('change', function () {
+            $('.tanNumber').toggleClass('d-none', !this.checked);
+        });
+        $('#gstCheck').on('change', function () {
+            $('.gstDoc').toggleClass('d-none', !this.checked);
+        });
         // error remove when key text and change select
         $('#updateCompany').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
-
-
-
-
         // form submit
         $('#updateCompany').submit(function (e) {
             e.preventDefault();
             $('#loader').show();
             $('.errorRemove').text('');
+             let isValid = true;
+            $('.document-block input[type="text"]').each(function () {
+                const $input = $(this);
+                const name = $input.attr('name');  
+                const value = $input.val().trim();
+                const label = $input.data('label')
+                const errorId = name.replace(/\[|\]/g, '_').replace(/_$/, '') + 'Error';
+                if (!value) {
+                    $(`#${errorId}`).text(`${label} is required.`);
+                    isValid = false;
+                } else if (name.includes('aadhaarCard_number') && !/^[2-9]\d{11}$/.test(value)) {
+                    $(`#${errorId}`).text(`${label} must be a valid 12-digit Aadhaar number (not starting with 0 or 1).`);
+                    isValid = false;
+                }
 
-            $.post({ url: $(this).attr('action'), data: $(this).serialize() }).done(res => {
+            });
+            $('.document-block .doc-upload').each(function () {
+                const $input = $(this);
+                const name = $input.attr('name'); 
+                const file = $input[0].files[0];
+                const label = $input.data('label');
+                const errorId = name + 'Error';
+                const removeValue = $(`input[name="remove_${name}"]`).val();
+                if (!file && removeValue === '1') {
+                    $('#' + errorId).text(`${label} is required.`);
+                    isValid = false;
+                }
+            });
+            if (!isValid) {
+                $('#loader').hide();
+                return;
+            }
+            const formData = new FormData(this);
+            $.post({ url: $(this).attr('action'), data: formData, contentType: false, processData: false }).done(res => {
                 if (res.errors) {
                     $('#loader').hide();
                     let firstErrorField = null;
@@ -160,6 +448,96 @@
             setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
         }
 
+        function generateUploadField({ label, name, previewId, value = '' }) {
+            return `<div class="col-md-6 mb-3"><label>${label}<span class="text-danger"><%=__("*") %></span></label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}" data-label="${label}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div><button type="button" class="btn-close-preview">×</button><input type="hidden" class="removeImg" name="remove_${name}" value="0"></div> <input type="hidden" name="${name}Old" value="${value}"><div class="action-buttons mt-2" id="${previewId}Actions"></div><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
+        }
+
+        function renderDocumentFields({ docType, docName, docLabel, side }) {
+            $('.document-block').remove();
+            const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
+            const formattedDocName = docName.charAt(0).toLowerCase() + docName.slice(1);
+            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number <span class="text-danger"><%=__("*") %></span> </label><input type="text" name="company[${formattedDocName}]" class="form-control" placeholder="Enter ${docLabel} Number" data-label="${docLabel} Number"><span id="company_${formattedDocName}Error" class="text-danger errorRemove"></span></div></div>`;
+            let uploadHTML = '';
+            if (side === 'front' || side === 'both') {
+                const frontMeta = documents.find(d => d.meta_key === `${formattedDocType}_front`);
+                uploadHTML += generateUploadField({
+                    label: `${docLabel} (Front)`,
+                    name: `${formattedDocType}_front`,
+                    previewId: `${formattedDocType}FrontPreview`,
+                    value: frontMeta?.meta_value || ''
+                });
+            }
+            if (side === 'back' || side === 'both') {
+                const backMeta = documents.find(d => d.meta_key === `${formattedDocType}_back`);
+                uploadHTML += generateUploadField({
+                    label: `${docLabel} (Back)`,
+                    name: `${formattedDocType}_back`,
+                    previewId: `${formattedDocType}BackPreview`,
+                    value: backMeta?.meta_value || ''
+                });
+            }
+            const $block = $(inputHTML);
+            $block.append(uploadHTML);
+            $('.dynamicDocFields').append($block);
+        }
+       
+       
+
+        // change goverment doc
+        $('.govermentDoc').on('change', function () {
+            const $selected = $(this).find('option:selected');
+            const docType = $selected.data('type');
+            const docName = $selected.data('name');
+            const docLabel = $selected.data('label');
+            const side = $selected.data('side');
+
+
+            if (docType && docName && docLabel && side) {
+                renderDocumentFields({ docType, docName, docLabel, side });
+            setTimeout(() => {
+                const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
+                const formattedDocName = docName.charAt(0).toLowerCase() + docName.slice(1);
+
+                    documents.forEach(doc => {
+                        const key = doc.meta_key;
+                        const value = doc.meta_value;
+                        const status = doc.status;
+                        const docId = doc.id;
+                        const fileUrl = `<%= base_url + img_url %>${value}`;
+                        if (key === formattedDocName) {
+                            $(`input[name="company[${formattedDocName}]"]`).val(value);
+                        }
+                        if (key === `${formattedDocType}_front` || key === `${formattedDocType}_back`) {
+                            const side = key.endsWith('_front') ? 'Front' : 'Back';
+                            const previewId = `${formattedDocType}${side}Preview`;
+                            const $imgDiv = $(`#${previewId}`);
+                            const $img = $imgDiv.find('img');
+                            const $info = $imgDiv.find('.file-info');
+                            const $actions = $(`#${previewId}Actions`);
+
+                            if (value.toLowerCase().endsWith('.pdf')) {
+                                $img.hide();
+                                $info.text(value.split('/').pop()).show();
+                            } else {
+                                $img.attr('src', fileUrl).show();
+                                $info.hide();
+                            }
+
+                            $imgDiv.removeClass('d-none');
+
+                            if (status == 'pending') {
+                                const label = `${docType} (${side})`;
+                                $actions.html(` <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Approved") %></button><button type="button" class="btn btn-warning action-btn btn-sm" 
+                                data-action="rejected" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Rejected") %></button> `);
+                            }
+                        }
+                    });
+                }, 100);   
+            } else {
+                $('.dynamicDocFields').html('');
+            }
+        });
+        $('.govermentDoc').val(`<%= documents.find(item => item.meta_key == 'govermentDoc')?.meta_value %>`).trigger('change');
 
 
 

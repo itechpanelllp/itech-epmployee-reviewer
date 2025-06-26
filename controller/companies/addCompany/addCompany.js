@@ -38,19 +38,15 @@ const addCompanyView = async (req, res) => {
 // add company action
 const addCompanyAction = async (req, res) => {
     try {
-        const {
-            businessType, businessName, businessEmail, businessPhone,
-            employeeStrength, businessWebsite, password, contactPersonName,
-            contactPersonEmail, contactPersonPhone, country, state, city,
-            address, postalCode, operationalCountry, operationalState,
-            operationalCity, operationalAddress, operationalPostalCode,
-            companyStatus, sameAddress,
-            company = {}
+        const { businessType, businessName, businessEmail, businessPhone, employeeStrength, businessWebsite, password, contactPersonName,
+            contactPersonEmail, contactPersonPhone, country, state, city, address, postalCode, operationalCountry, operationalState,
+            operationalCity, operationalAddress, operationalPostalCode, companyStatus, sameAddress, company = {}
         } = req.body;
 
-        const getFile = key => req.files?.[key]?.[0]?.filename || '';
-        const logo = getFile('logo');
 
+        const getFile = key => req.files?.[key]?.[0]?.filename || '';
+        const logo = getFile('companyLogo');
+        
         if (await companyModel.checkCompanyName(businessEmail)) {
             return res.status(200).json({ error: 'Company name already exists' });
         }
@@ -66,7 +62,7 @@ const addCompanyAction = async (req, res) => {
             email: contactPersonEmail,
             phone: contactPersonPhone,
             status: companyStatus,
-            logo: `${uploadprofile}/${logo}`,
+            logo: logo ? `${uploadprofile}/${logo}`: '',
             password: await bcrypt.hash(password, 10),
         });
 
@@ -82,6 +78,7 @@ const addCompanyAction = async (req, res) => {
 
         const docs = [
             { key: 'panNumber', value: company.panNumber, file: getFile('panFile'), fileKey: 'panFile' },
+            { key: 'govermentDoc', value: company.govermentDoc, file: '', fileKey: '' },
             ...(company.tanNumberCheck === 'on' ? [{ key: 'tanNumber', value: company.tanNumber }, { key: 'tanNumberCheck', value: 'on' }] : []),
             ...(company.gstCheck === 'on' ? [
                 { key: 'gstCheck', value: 'on' },

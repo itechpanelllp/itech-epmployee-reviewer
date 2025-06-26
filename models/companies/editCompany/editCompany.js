@@ -48,5 +48,53 @@ module.exports = {
         return result || '';
     },
 
+    // get documents
+    getDocuments: async (id) => {
+        const result = await db.query(`SELECT * FROM ${companyTables.company_documents} WHERE company_id = ?`, [id]);
+        return result || '';
+    },
+    getDocumentType: async () => {
+        const result = await db.query(`SELECT id, name, side FROM ${companyTables.government_id_documents} WHERE status = 'active'`);
+        return result || '';
+    },
+  
+ 
+
+    // Delete multiple document keys
+    deleteDocument: async (companyId, keys = []) => {
+        if (!companyId || !Array.isArray(keys) || !keys.length) return;
+        const placeholders = keys.map(() => '?').join(', ');
+        const query = `DELETE FROM ${companyTables.company_documents} WHERE company_id = ? AND meta_key IN (${placeholders})`;
+        return await db.query(query, [companyId, ...keys]);
+    },
+
+    // Update a single document key
+    updateDocument: async (companyId, metaKey, metaValue) => {
+        const query = `UPDATE ${companyTables.company_documents} SET meta_value = ? WHERE company_id = ? AND meta_key = ?`;
+        return await db.query(query, [metaValue, companyId, metaKey]);
+    },
+
+    // Insert a new document key
+    addDocument: async ({ company_id, meta_key, meta_value }) => {
+        const query = `INSERT INTO ${companyTables.company_documents} (company_id, meta_key, meta_value) VALUES (?, ?, ?)`;
+        return await db.query(query, [company_id, meta_key, meta_value]);
+    },
+
+    // Upsert logic (insert or update)
+    updateOrInsertDocument: async (companyId, metaKey, metaValue) => {
+    const query = `
+        INSERT INTO ${companyTables.company_documents}
+        (company_id, meta_key, meta_value)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE meta_value = VALUES(meta_value)
+    `;
+    return db.query(query, [companyId, metaKey, metaValue]);
+}
+
+
+
+
+
+
 
 }
