@@ -95,6 +95,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- tan details -->
                          <div class="row">
                             <span class="mb-3"> <h5><%=__("Business documents") %></h5></span>
                             <!-- tan number -->
@@ -110,28 +111,11 @@
                                 <span id="tanNumberError" class="text-danger errorRemove"></span>
                             </div>
                         </div>
-                        <div class="row"> 
-                            <!-- goverment id -->
-                            <div class="col-md-6 mb-3">
-                                <label for="govermentDoc" class="form-label required_field"><%=__("Government Approved Identification Documents") %><span class="text-danger"><%=__("*") %></span></label>
-                                <select name="company[govermentDoc]" id="govermentDoc" class="form-select govermentDoc">
-                                    <option value><%=__("Select government authority documents") %></option>
-                                    <% if(documentType && documentType.length > 0) {%>
-                                        <% documentType.forEach( item => { 
-                                            let typeKey = item.name.replace(/\s/g, '');%>
-                                        <option value="<%= item.id %>"  data-type="<%= typeKey %>" data-name="<%= typeKey %>_number" data-label="<%= item.name %>"  data-side="<%= item.side %>"><%= item.name %></option>
-                                        <% }) %>
-                                    <% } %>
-                                </select>
-                                <input type="hidden" name="oldGovermentDoc" value="<%= documents.find(item => item.meta_key == 'govermentDoc')?.meta_value  || '' %>">
-                                <span id="govermentDocError" class="text-danger errorRemove"></span>
-                            </div>
-                        </div>
-                        <div class="form-check mb-3">
+                        <div class="form-check mb-3 p-2">
                             <input type="checkbox" name="company[gstCheck]" id="gstCheck" <%= documents.find(item => item.meta_key === 'gstCheck' && item.meta_value === 'on') ? 'checked' : '' %>>
                             <label class="form-check-label" for="gstCheck"><%=__("I have GST Number") %></label>
                         </div>
-                        <%      // Helper function for preview logic
+                        <%
                             const getFileMeta = (key) => {
                             const doc = documents.find(d => d.meta_key === key);
                             const path = doc?.meta_value || '';
@@ -144,7 +128,6 @@
                             };
                             const gst = getFileMeta('gstFile');
                             const pan = getFileMeta('panFile');
-                        
                             const componyLogo = {
                                 path: data.logo || '',
                                 fileName: (data.logo || '').split('/').pop(),
@@ -152,13 +135,13 @@
                                 url: data.logo ? base_url + img_url + data.logo : ''
                             };
                             %>
+                        <!-- gst details -->
                         <div class="row gstDoc <%= documents.find(item => item.meta_key === 'gstCheck' && item.meta_value === 'on') ? '' : 'd-none' %>">
-                            
                             <!-- GST Number -->
                             <div class="col-md-6 mb-3">
                                 <label for="gstNumber"><%=__("GST Number") %><span class="text-danger"><%=__("*") %></span></label>
                                 <input type="text" id="gstNumber" name="company[gstNumber]" class="form-control" placeholder="Enter GST Number" value="<%= documents.find(item => item.meta_key == 'gstNumber')?.meta_value  || '' %>">
-                                <span id="company_gstNumberError" class="text-danger errorRemove"></span>
+                                <span id="gstNumberError" class="text-danger errorRemove"></span>
                             </div>
                             <!-- GST Upload -->
                             <div class="col-md-6 mb-3">
@@ -167,23 +150,32 @@
                                 <div id="gstPreview" class="img-preview <%= gst.path ? '' : 'd-none' %>">
                                     <img src="<%= gst.isPdf ? '' : gst.url %>" class="img-thumbnail"style="<%= gst.isPdf ? 'display:none;' : 'display:inline;' %>">
                                     <div class="file-info"style="<%= gst.isPdf ? 'display:block;' : 'display:none;' %>"><%= gst.fileName %></div>
+                                    <% if (gst.status === 'pending') { %>
                                     <button type="button" class="btn-close-preview">×</button>
+                                    <% } %>
+                                    <div class="mt-2 docStatus">
+                                        <% if (gst.status == 'pending') { %>
+                                        <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                        <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                    <% } else {%>
+                                          <span class="badge <%= gst.status === 'approved' ? 'bg-success' : 'bg-warning' %>">
+                                            <%= gst.status === 'approved' ? __('Approved') : __('Rejected') %>
+                                        </span>
+                                    <% } %>
+                                    </div>
                                     <input type="hidden" name="gstFileOld" value="<%= gst.path %>">
                                     <input type="hidden" class="removeImg" name="removeGSTImg" value="0">
-                                </div>
-                                <% if (gst.status == 'pending') { %>
-                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
-                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= gst.docId %>" data-file="GST Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
-                                <% } %>
+                               </div>
                                 <span id="gstFileError" class="text-danger errorRemove"></span>
                             </div>
                         </div>
+                        <!-- pan details -->
                         <div class="row">
                           <!-- PAN Number -->
                             <div class="col-md-6 mb-3">
                                 <label for="panNumber"><%=__("PAN Number") %><span class="text-danger"><%=__("*") %></span></label>
                                 <input type="text" id="panNumber" name="company[panNumber]" id="panNumber" class="form-control" placeholder="Enter PAN Number" value="<%= documents.find(item => item.meta_key == 'panNumber')?.meta_value  || '' %>">
-                                <span id="company_panNumberError" class="text-danger errorRemove"></span>
+                                <span id="panNumberError" class="text-danger errorRemove"></span>
                             </div>
 
                             <!-- PAN Upload -->
@@ -197,14 +189,22 @@
                                     <img src="<%= pan.url %>" class="img-thumbnail" style="display: inline;">
                                     <div class="file-info" style="display: none;"></div>
                                     <% } %>
+                                   <% if (pan.status === 'pending') { %>
                                     <button type="button" class="btn-close-preview">×</button>
+                                    <% } %>
+                                    <div class="mt-2 docStatus">
+                                    <% if (pan.status === 'pending') { %>
+                                        <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                        <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                     <% } else {%>
+                                          <span class="showDocStatus badge <%= pan.status === 'approved' ? 'bg-success' : 'bg-warning' %>">
+                                            <%= pan.status === 'approved' ? __('Approved') : __('Rejected') %>
+                                        </span>
+                                    <% } %>
+                                    </div>
                                     <input type="hidden" name="panFileOld" value="<%= pan.path %>">
                                     <input type="hidden" class="removeImg" name="removePanImg" value="0">
                                 </div>
-                                <% if (pan.status === 'pending') { %>
-                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
-                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
-                                <% } %>
                                 <span id="panFileError" class="text-danger errorRemove"></span>
                             </div>
                           
@@ -221,8 +221,25 @@
                             </div>
                         </div>
                         </div>
-                          <!-- insert custom fileds -->
-                        <div class="row dynamicDocFields"></div>
+                         <!-- goverment id -->
+                        <div class="row"> 
+                            <div class="col-md-6 mb-3">
+                                <label for="govermentDoc" class="form-label required_field"><%=__("Government Approved Identification Documents") %><span class="text-danger"><%=__("*") %></span></label>
+                                <select name="company[govermentDoc]" id="govermentDoc" class="form-select govermentDoc">
+                                    <option value><%=__("Select government authority documents") %></option>
+                                    <% if(documentType && documentType.length > 0) {%>
+                                        <% documentType.forEach( item => { 
+                                            let typeKey = item.name.replace(/\s/g, '');%>
+                                        <option value="<%= item.id %>"  data-type="<%= typeKey %>" data-name="<%= typeKey %>_number" data-label="<%= item.name %>"  data-side="<%= item.side %>"><%= item.name %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                                <input type="hidden" name="oldGovermentDoc" value="<%= documents.find(item => item.meta_key == 'govermentDoc')?.meta_value  || '' %>">
+                                <span id="govermentDocError" class="text-danger errorRemove"></span>
+                            </div>
+                               <!-- insert custom fileds -->
+                            <div class="dynamicDocFields"></div>
+                        </div>
                         <% if(updatePer) { %>
                         <div class="float-end">
                             <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
@@ -235,15 +252,17 @@
     </div>
 </div>
 <%- include('../../common/footer') %>
+<!-- status update -->
 <script>
 $(document).on('click', '.action-btn', function () {
     const action = $(this).data('action');
     const docId = $(this).data('id');
     const url = $(this).data('url');
     const file = $(this).data('file');
+    const fileData = file ? file : '';
     const confirmText = {
-      approved: `<%= __('Are you sure you want to approve this') %> ${file} ?`,
-      rejected: `<%= __('Are you sure you want to reject this') %> ${file} ?`,
+      approved: `<%= __('Are you sure you want to approve this') %> ${fileData} ?`,
+      rejected: `<%= __('Are you sure you want to reject this') %> ${fileData} ?`,
     };
 
     Swal.fire({
@@ -265,7 +284,7 @@ $(document).on('click', '.action-btn', function () {
       reverseButtons: true
     }).then(({ isConfirmed, value: comment}) => {
       if (isConfirmed) {
-        $.post(`${$baseurl}${url}/${docId}`, { action, comment, file }).done(res => {
+        $.post(`${$baseurl}${url}/${docId}`, { action, comment }).done(res => {
           if (res.success) {
             Swal.fire({
               icon: 'success',
@@ -289,6 +308,7 @@ $(document).on('click', '.action-btn', function () {
   });
 
 </script>
+<!-- file upload -->
 <script>
 $(document).on('change', '.doc-upload', function () {
   const fileInput = this;
@@ -298,6 +318,7 @@ $(document).on('change', '.doc-upload', function () {
   const previewImg = previewBox.find('img');
   const previewText = previewBox.find('.file-info');
   const errorSpan = $(fileInput).siblings('span.text-danger');
+  
 
   // Reset previous state
   errorSpan.text('');
@@ -324,13 +345,13 @@ $(document).on('change', '.doc-upload', function () {
     reader.onload = function (e) {
       const img = new Image();
       img.onload = function () {
-        // ✅ Image is valid and loaded
         previewImg.attr('src', e.target.result).show();
         previewText.hide();
         previewBox.removeClass('d-none');
+        previewBox.find('.docStatus').removeClass('d-none');
+        previewBox.find('.showDocStatus').addClass('d-none');
       };
       img.onerror = function () {
-        // ❌ Invalid or corrupted image
         errorSpan.text(`<%= __("The selected image could not be displayed. It may be corrupted.") %>`);
         $(fileInput).val('');
       };
@@ -338,12 +359,12 @@ $(document).on('change', '.doc-upload', function () {
     };
     reader.readAsDataURL(file);
   } else if (fileType === validPdfType) {
-    // Show file name for PDF
     previewImg.hide();
     previewText.text(fileName).show();
     previewBox.removeClass('d-none');
+    previewBox.find('.docStatus').removeClass('d-none');
   } else {
-    // Unsupported file type
+      previewBox.find('.docStatus').addClass('d-none');
     errorSpan.text(`<%= __("Only JPG, PNG, and PDF files are allowed.") %>`);
     $(fileInput).val('');
   }
@@ -363,8 +384,11 @@ $(document).on('click', '.btn-close-preview', function () {
   fileInput.val('');
   errorSpan.text('');
   previewBox.find('.removeImg').val('1');
+  previewBox.find('.docStatus').addClass('d-none'); 
+
 });
 </script>
+<!-- form details -->
 <script>
     $(document).ready(function () {
         setTimeout(() => $('#loader').hide(), 300);
@@ -383,48 +407,51 @@ $(document).on('click', '.btn-close-preview', function () {
         $('#updateCompany').submit(function (e) {
             e.preventDefault();
             $('#loader').show();
+            const $form = $(this);
             $('.errorRemove').text('');
-             let isValid = true;
+            let isValid = true;
+            let firstError = null;
+
+            // Validate text inputs
             $('.document-block input[type="text"]').each(function () {
-                const $input = $(this);
-                const name = $input.attr('name');  
-                const value = $input.val().trim();
-                const label = $input.data('label')
-                const errorId = name.replace(/\[|\]/g, '_').replace(/_$/, '') + 'Error';
-                if (!value) {
-                    $(`#${errorId}`).text(`${label} is required.`);
-                    isValid = false;
-                } else if (name.includes('aadhaarCard_number') && !/^[2-9]\d{11}$/.test(value)) {
-                    $(`#${errorId}`).text(`${label} must be a valid 12-digit Aadhaar number (not starting with 0 or 1).`);
+                const $el = $(this), name = $el.data('doc'), val = $el.val().trim();
+                const label = $el.data('label'), errorId = name + 'Error';
+                if (!val || (name.includes('aadhaarCard_number') && !/^[2-9]\d{11}$/.test(val))) {
+                    $(`#${errorId}`).text(!val ? `${label} is required.` : `${label} must be a valid 12-digit Aadhaar number`);
+                    if (!firstError) firstError = $el;
                     isValid = false;
                 }
-
             });
+
+            // Validate file inputs
             $('.document-block .doc-upload').each(function () {
-                const $input = $(this);
-                const name = $input.attr('name'); 
-                const file = $input[0].files[0];
-                const label = $input.data('label');
-                const errorId = name + 'Error';
-                const removeValue = $(`input[name="remove_${name}"]`).val();
-                if (!file && removeValue === '1') {
-                    $('#' + errorId).text(`${label} is required.`);
+                const $el = $(this), name = $el.attr('name'), file = $el[0].files[0];
+                const label = $el.data('label'), errorId = name + 'Error';
+                const removed = $(`input[name="remove_${name}"]`).val() === '1';
+                const oldEmpty = !$(`input[name="${name}Old"]`).val();
+                if (!file && (removed || oldEmpty)) {
+                    $(`#${errorId}`).text(`${label} is required.`);
+                    if (!firstError) firstError = $el;
                     isValid = false;
                 }
             });
             if (!isValid) {
                 $('#loader').hide();
+                if (firstError) firstError.focus();
                 return;
             }
             const formData = new FormData(this);
             $.post({ url: $(this).attr('action'), data: formData, contentType: false, processData: false }).done(res => {
                 if (res.errors) {
                     $('#loader').hide();
-                    let firstErrorField = null;
+                   let firstErrorField = null;
                     for (const field in res.errors) {
                         const normalizedField = field.replace(/\[|\]/g, '_');
-                        const $input = $(this).find(`[name="${field}"]`);
-                        const $error = $(`#${normalizedField}Error`);
+                        let $input = $form.find(`[name="${field}"]`);
+                        if (!$input.length) {
+                            $input = $form.find(`[name="company[${field}]"]`);
+                        }
+                        const $error = $(`#${field}Error`);
                         $error.text(res.errors[field]);
                         if (!firstErrorField && $input.length) {
                             firstErrorField = $input;
@@ -448,15 +475,16 @@ $(document).on('click', '.btn-close-preview', function () {
             setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
         }
 
-        function generateUploadField({ label, name, previewId, value = '' }) {
-            return `<div class="col-md-6 mb-3"><label>${label}<span class="text-danger"><%=__("*") %></span></label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}" data-label="${label}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div><button type="button" class="btn-close-preview">×</button><input type="hidden" class="removeImg" name="remove_${name}" value="0"></div> <input type="hidden" name="${name}Old" value="${value}"><div class="action-buttons mt-2" id="${previewId}Actions"></div><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
+        function generateUploadField({ label, name, previewId, value = '', status = '' }) {
+            const isPending = status == 'pending' || status == '';
+            return `<div class="col-md-6 mb-3"><label>${label}<span class="text-danger"><%=__("*") %></span></label><input type="file" class="form-control doc-upload" name="${name}" data-preview="#${previewId}" data-label="${label}"><div class="img-preview d-none" id="${previewId}"><img src="" class="img-thumbnail" /><div class="file-info"></div> ${isPending ? `<button type="button" class="btn-close-preview">×</button>` : ''}<input type="hidden" class="removeImg" name="remove_${name}" value="0"><div class="action-buttons mt-2" id="${previewId}Actions"></div></div> <input type="hidden" name="${name}Old" value="${value}"><span id="${name}Error" class="text-danger errorRemove"></span></div>`;
         }
 
         function renderDocumentFields({ docType, docName, docLabel, side }) {
             $('.document-block').remove();
             const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
             const formattedDocName = docName.charAt(0).toLowerCase() + docName.slice(1);
-            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number <span class="text-danger"><%=__("*") %></span> </label><input type="text" name="company[${formattedDocName}]" class="form-control" placeholder="Enter ${docLabel} Number" data-label="${docLabel} Number"><span id="company_${formattedDocName}Error" class="text-danger errorRemove"></span></div></div>`;
+            const inputHTML = `<div class="row document-block"><div class="col-md-6 mb-3"><label>${docLabel} Number <span class="text-danger"><%=__("*") %></span> </label><input type="text" name="company[${formattedDocName}]" data-doc="${formattedDocName}" class="form-control" placeholder="Enter ${docLabel} Number" data-label="${docLabel} Number"><span id="${formattedDocName}Error" class="text-danger errorRemove"></span></div></div>`;
             let uploadHTML = '';
             if (side === 'front' || side === 'both') {
                 const frontMeta = documents.find(d => d.meta_key === `${formattedDocType}_front`);
@@ -464,7 +492,8 @@ $(document).on('click', '.btn-close-preview', function () {
                     label: `${docLabel} (Front)`,
                     name: `${formattedDocType}_front`,
                     previewId: `${formattedDocType}FrontPreview`,
-                    value: frontMeta?.meta_value || ''
+                    value: frontMeta?.meta_value || '',
+                    status: frontMeta?.status || ''
                 });
             }
             if (side === 'back' || side === 'both') {
@@ -473,7 +502,8 @@ $(document).on('click', '.btn-close-preview', function () {
                     label: `${docLabel} (Back)`,
                     name: `${formattedDocType}_back`,
                     previewId: `${formattedDocType}BackPreview`,
-                    value: backMeta?.meta_value || ''
+                    value: backMeta?.meta_value || '',
+                    status: backMeta?.status || ''
                 });
             }
             const $block = $(inputHTML);
@@ -490,14 +520,11 @@ $(document).on('click', '.btn-close-preview', function () {
             const docName = $selected.data('name');
             const docLabel = $selected.data('label');
             const side = $selected.data('side');
-
-
             if (docType && docName && docLabel && side) {
                 renderDocumentFields({ docType, docName, docLabel, side });
             setTimeout(() => {
                 const formattedDocType = docType.charAt(0).toLowerCase() + docType.slice(1);
                 const formattedDocName = docName.charAt(0).toLowerCase() + docName.slice(1);
-
                     documents.forEach(doc => {
                         const key = doc.meta_key;
                         const value = doc.meta_value;
@@ -514,7 +541,6 @@ $(document).on('click', '.btn-close-preview', function () {
                             const $img = $imgDiv.find('img');
                             const $info = $imgDiv.find('.file-info');
                             const $actions = $(`#${previewId}Actions`);
-
                             if (value.toLowerCase().endsWith('.pdf')) {
                                 $img.hide();
                                 $info.text(value.split('/').pop()).show();
@@ -522,13 +548,12 @@ $(document).on('click', '.btn-close-preview', function () {
                                 $img.attr('src', fileUrl).show();
                                 $info.hide();
                             }
-
                             $imgDiv.removeClass('d-none');
-
                             if (status == 'pending') {
                                 const label = `${docType} (${side})`;
-                                $actions.html(` <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Approved") %></button><button type="button" class="btn btn-warning action-btn btn-sm" 
-                                data-action="rejected" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Rejected") %></button> `);
+                                $actions.html(`<div class="d-flex gap-1 mt-2 docStatus"><button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Approved") %></button><button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="${docId}" data-file="${label}" data-url="<%= update_documents_status %>"><%= __("Rejected") %></button></div>`);
+                            }else{
+                                $actions.html(`<span class="badge ${status === 'approved' ? 'bg-success' : 'bg-warning' }">${status === 'approved' ? 'Approved' : 'Rejected'}</span>`)
                             }
                         }
                     });

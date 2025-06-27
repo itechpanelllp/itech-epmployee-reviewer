@@ -31,7 +31,10 @@ app.get(`/${path.COMPANIES_EDIT_VIEW}:id`, checkSession,  checkPermission('compa
 app.post(`/${path.COMPANIES_UPDATE_ACTION}:id`, checkSession,  uploadWithErrorHandler, updateCompany, checkPermission('companies', 'update'), editCompanyController.updateCompanyAction);
 
 // update company approval status
-app.post(`/${path.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION}:id`, checkSession, checkPermission('companies', 'update'), editCompanyController.updateCompanyApprovalStatus);
+app.post(`/${path.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION}/:id`, checkSession, checkPermission('companies', 'update'), editCompanyController.updateCompanyApprovalStatus);
+
+// update company documents status
+app.post(`/${path.COMPANIES_DOCUMENTS_STATUS_UPDATE_ACTION}:id/:docId`, checkSession, checkPermission('companies', 'update'), editCompanyController.updateDocumentsStatusAction);
 
 
 

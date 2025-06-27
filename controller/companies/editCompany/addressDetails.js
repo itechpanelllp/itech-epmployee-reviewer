@@ -16,7 +16,7 @@ const editBusinessAddressView = async (req, res) => {
             business_info: companyPath.COMPANIES_EDIT_VIEW + id,
             contact_info: companyPath.COMPANIES_CONTACT_INFO_VIEW + id,
             address: companyPath.COMPANIES_ADDRESS_VIEW + id,
-            documents: companyPath.COMPANIES_DOCUMENTS_VIEW + id,
+            employees: companyPath.COMPANIES_EMPLOYEES_VIEW + id,
             password: companyPath.COMPANIES_PASSWORD_VIEW + id,
         };
         data.update_action = companyPath.COMPANIES_APPROVAL_STATUS_UPDATE_ACTION;

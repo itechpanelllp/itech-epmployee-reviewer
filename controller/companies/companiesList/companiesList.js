@@ -33,10 +33,10 @@ const companiesDataTable = async (req, res) => {
         const sort = columns[columnIndex]?.data || "id";
         const sortOrder = order[0]?.dir || "DESC";
 
-        const where = term ? `1 = 1 AND (c.id LIKE '%${term}%' OR c.business_name LIKE '%${term}%' OR c.business_email LIKE '%${term}%' OR ct.name LIKE '%${term}%' OR cb.name LIKE '%${term}%' OR ci.name LIKE '%${term}%' OR c.status LIKE '%${term}%')` : `1 = 1`;
+        const where = term ? `1 = 1 AND (c.id LIKE '%${term}%' OR c.business_name LIKE '%${term}%' OR c.business_email LIKE '%${term}%' OR ct.name LIKE '%${term}%' OR cb.name LIKE '%${term}%' OR ci.name LIKE '%${term}%' OR c.status LIKE '%${term}%' OR st.name LIKE '%${term}%')` : `1 = 1`;
         // get role data
         let records = await companyModel.companiesDataTable(where, start, limit, sort, sortOrder);
-      
+
         records = JSON.parse(JSON.stringify(records, (_, value) => (typeof value === "bigint" ? value.toString() : value)));
         const totalRecords = records?.[0]?.total || 0;
         // check permission
@@ -44,7 +44,7 @@ const companiesDataTable = async (req, res) => {
         const updatPer = await checkPermissionEJS('companies', 'update', req);
         const dataArr = records.map((row) => {
 
-              var status = updatPer ? `<div class="form-check form-switch form-switch-lg" dir="ltr"><input type="checkbox" class="form-check-input companystatus" data-status = ${row.status} row-id = ${row.id} id="companystatus" ${row.status == 'active' ? 'checked' : ''} ><label class="form-check-label" for="companystatus"></label></div>` : row.status == 'active' ? res.__("ACTIVE") : res.__("INACTIVE")
+            var status = updatPer ? `<div class="form-check form-switch form-switch-lg" dir="ltr"><input type="checkbox" class="form-check-input companystatus" data-status = ${row.status} row-id = ${row.id} id="companystatus" ${row.status == 'active' ? 'checked' : ''} ><label class="form-check-label" for="companystatus"></label></div>` : row.status == 'active' ? res.__("ACTIVE") : res.__("INACTIVE")
             const editBtn = `<a href="${base_url + companyPath.COMPANIES_EDIT_ACTION}${row.id}"><i class="font-size-18 fas fa-edit"></i></a>`;
 
             const dltBtn = dltPer ? `<button type="button" class="delete_company border-0 bg-transparent" data-url = "${companyPath.COMPANIES_DELETE_ACTION}" data-id="${row.id}"><i class="font-size-18 fas fa-trash" style="color:#d73328"></i></button>` : '-';
@@ -52,6 +52,7 @@ const companiesDataTable = async (req, res) => {
                 id: row.id,
                 name: ` <div> <div class="fw-semibold">${row.business_name}</div><div class="text-muted small">${row.business_email}</div> <div class="text-muted small">${row.company_type_name}</div></div> `,
                 country: row.Regcountry,
+                state: row.Regstate,
                 city: row.Regcity,
                 status: status,
                 action: `<div class="d-flex items-center gap-3 cursor-pointer">${editBtn}${dltBtn}</div>`,

@@ -302,5 +302,9 @@
 	"Invalid document type selected": "Invalid document type selected",
 	"Please select a document type": "Please select a document type",
 	"Aadhaar Card number is required": "Aadhaar Card number is required",
-	"Voter ID number is required": "Voter ID number is required"
+	"Voter ID number is required": "Voter ID number is required",
+	"must be a valid 12-digit Aadhaar number (not starting with 0 or 1": "must be a valid 12-digit Aadhaar number (not starting with 0 or 1",
+	"Employee details": "Employee details",
+	"Add-employee": "Add-employee",
+	"Are you sure you want to delete this employee ?": "Are you sure you want to delete this employee ?"
 }

@@ -40,7 +40,6 @@ app.get(`/${path.COMPANIES_ADD_VIEW}`, checkSession, checkPermission('companies'
 app.post(`/${path.COMPANIES_ADD_ACTION}`, checkSession, uploadWithErrorHandler, checkPermission('companies', 'add'), companiesValidation, addCompanyController.addCompanyAction);
 
 
-
 // companies delete
 app.post(`/${path.COMPANIES_DELETE_ACTION}:id`, checkSession, checkPermission('companies','delete'), companyListController.deleteCompany);
 
