@@ -15,7 +15,9 @@ router.use('/', require('./companies/companies'));
 router.use('/', require('./companies/editCompany'));
 router.use('/', require('./companies/conatctDetails'));
 router.use('/', require('./companies/addressDetails'));
-// router.use('/', require('./companies/employeeList'));
+router.use('/', require('./companies/employeeList'));
+router.use('/', require('./companies/addEmployee'));
+router.use('/', require('./companies/editEmployee'));
 router.use('/', require('./companies/password'));
 router.use('/', require('./companies/emailVerification'));
 

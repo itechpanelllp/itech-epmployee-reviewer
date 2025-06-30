@@ -134,7 +134,7 @@
                                 isPdf: (data.logo || '').toLowerCase().endsWith('.pdf'),
                                 url: data.logo ? base_url + img_url + data.logo : ''
                             };
-                            %>
+                        %>
                         <!-- gst details -->
                         <div class="row gstDoc <%= documents.find(item => item.meta_key === 'gstCheck' && item.meta_value === 'on') ? '' : 'd-none' %>">
                             <!-- GST Number -->

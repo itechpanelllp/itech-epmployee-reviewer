@@ -621,8 +621,7 @@ $(document).on('click', '.btn-close-preview', function () {
              updateHiddenFields();
             const formData = new FormData(this);
             $.post({ url: `<%= base_url + add_company %>`, data: formData, contentType: false, processData: false }).done(res => {
-                console.log(res.errors);
-                
+              
                 if (res.errors) {
                     $('#loader').hide();
                     let firstErrorField = null;

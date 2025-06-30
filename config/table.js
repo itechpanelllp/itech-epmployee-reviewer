@@ -18,6 +18,14 @@ module.exports = {
     employee_strength:'employee_strength',
     company_meta:'company_meta',
     government_id_documents:'government_id_documents',
+    designation_master:'designation_master',
+    working_days:'working_days',
+    employees:'employees',
+    employee_address:'employee_address',
+    employee_documents:'employee_documents',
+    employee_financial_details:'employee_financial_details',
+    employee_meta:'employee_meta',
+ 
   
    
 

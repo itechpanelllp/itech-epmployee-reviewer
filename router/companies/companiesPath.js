@@ -30,9 +30,10 @@ module.exports = {
     COMPANIES_EMPLOYEES_DATA_TABLE_ACTION: 'companies/employees/data-table/',
     COMPANIES_EMPLOYEES_ADD_VIEW: 'companies/employees/add/',
     COMPANIES_EMPLOYEES_ADD_ACTION: 'companies/employees/add/',
-    COMPANIES_EMPLOYEES_EDIT_ACTION: 'companies/employees/edit/',
+    COMPANIES_EMPLOYEES_EDIT_VIEW: 'companies/employees/edit/',
     COMPANIES_EMPLOYEES_DELETE_ACTION: 'companies/employees/delete/',
     COMPANIES_EMPLOYEES_UPDATE_ACTION: 'companies/employees/update/',
+    COMPANIES_EMPLOYEES_UPDATE_DOCUMENTS_STATUS_ACTION: 'companies/employees/update-documents-status/',
 
     // password
     COMPANIES_PASSWORD_VIEW: 'companies/password/',
@@ -40,7 +41,7 @@ module.exports = {
 
     // email verification
     COMPANY_EMAIL_VERIFICATION: 'companies/email-verification/',
-   
+
 
 
 

@@ -1,0 +1,695 @@
+<%- include('../../common/header', title) %>
+<div id="loader"></div>
+<div class="col-12 col-xl-12 grid-margin stretch-card">
+    <div class="card overflow-hidden">
+        <div class="card-body">
+            
+            <% let formAction = employeeData ? (addPermission ? base_url + update_action : '') : (addPermission ? base_url + add_employees : ''); %>
+            <form id="addEmployee" action="<%= formAction %>" enctype="multipart/form-data">
+                <div class="row">
+                    <span class="mb-3"> <h5><%=__("Basic details") %></h5></span>
+                    <!-- Employee id -->
+                    <div class="col-md-6 mb-3">
+                        <label for="empId" class="form-label"><%=__("Employee ID") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control" id="empId" name="empId"
+                            placeholder="<%=__("Employee ID") %>" value="<%= employeeData.emp_id  || '' %>">
+                        <span id="empIdError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- first name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label"><%=__("First Name") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control" id="firstName" name="firstName"
+                            placeholder="<%=__("Enter First Name") %>" value="<%= employeeData.first_name  || '' %>">
+                        <span id="firstNameError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- last name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label"><%=__("Last Name") %></label>
+                        <input type="text" class="form-control" id="lastName" name="lastName"
+                            placeholder="<%=__("Enter Last Name") %>" value="<%= employeeData.last_name  || '' %>">
+                        <span id="lastNameError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- email -->
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label"><%=__("Email") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="email" class="form-control" id="email" name="email"
+                            placeholder="<%=__("Enter Email") %>" value="<%= employeeData.email  || '' %>">
+                        <span id="emailError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- Phone number -->
+                    <div class="col-md-6 mb-3">
+                        <label for="Phone Number" class="form-label"><%=__("Phone Number") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control nvInput" id="PhoneNumber" name="PhoneNumber"
+                            placeholder="<%=__("Enter Phone Number") %>" value="<%= employeeData.phone_number  || '' %>">
+                        <span id="PhoneNumberError" class="text-danger errorRemove"></span>
+                    </div>
+                   
+                    <!-- date of birth -->
+                    <div class="col-md-6 mb-3 date-wrapper">
+                        <label for="dob" class="form-label"><%=__("Date of Birth") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="date" class="form-control" id="dob" name="dob"
+                            placeholder="<%=__("Enter Date of Birth") %>" style="cursor: pointer;" value="<%= employeeData.dob  || '' %>">
+                        <span id="dobError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- gender -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><%=__("Gender") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select class="form-select" id="gender" name="gender">
+                            <option value=""><%=__("Select Gender") %></option>
+                            <option value="male" <%= employeeData.gender == 'male' ? 'selected' : '' %>><%=__("Male") %></option>
+                            <option value="female" <%= employeeData.gender == 'female' ? 'selected' : '' %>><%=__("Female") %></option>
+                            <option value="other" <%= employeeData.gender == 'other' ? 'selected' : '' %>><%=__("Other") %></option>
+                        </select>
+                        <span id="genderError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- password -->
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label"><%=__("Password") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="<%=__("Enter Password") %>">
+                        <span id="passwordError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- status -->
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label"><%=__("Status") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select class="form-select" id="employeeStatus" name="status">
+                            <option value="active" <%= employeeData.status == 'active' ? 'selected' : '' %>><%=__("Active") %></option>
+                            <option value="inactive" <%= employeeData.status == 'inactive' ? 'selected' : '' %>><%=__("Inactive") %></option>
+                        </select>
+                        <span id="statusError" class="text-danger errorRemove"></span>
+                    </div>
+                    <span class="mb-3"><h5><%=__("Salary & Position") %></h5></span>
+                    <!-- salary -->
+                    <div class="col-md-6 mb-3">
+                        <label for="salary" class="form-label"><%=__("Salary") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control number_validation" id="salary" name="salary"
+                            placeholder="<%=__("Enter Salary") %>" value="<%= employeeData.salary  || '' %>">
+                        <span id="salaryError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- hours rate -->
+                    <div class="col-md-6 mb-3">
+                        <label for="hoursRate" class="form-label"><%=__("Hours Rate") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control number_validation" id="hoursRate" name="hoursRate"
+                            placeholder="<%=__("Enter Hours Rate") %>" value="<%= employeeData.hours_rate  || '' %>">
+                        <span id="hoursRateError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- position/ designation -->
+                    <div class="col-md-6 mb-3">
+                        <label for="designation" class="form-label"><%=__("Designation") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select name="designation" id="designation" class="form-select">
+                            <option value><%=__("Select designation") %></option>
+                            <% if(designation && designation.length > 0) {%>
+                            <% designation.forEach( item => { %>
+                            <option value="<%= item.id %>" <%= employeeData.designation_id == item.id ? 'selected' : '' %>><%= item.title %></option>
+                            <% }) %>
+                            <% } %>
+                        </select>
+                        <span id="designationError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- working days -->
+                    <div class="col-md-6 mb-3">
+                        <label for="workingDays" class="form-label"><%=__("Working Days") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <%  let selectedWorkingDays = [];
+                            const metaArray = JSON.parse(employeeData.employee_meta || '[]');
+                            selectedWorkingDays = metaArray .filter(item => item.meta_key == 'workingDays') .map(item => item.meta_value);
+                         %>
+                        <select name="workingDays" id="workingDays" class="form-select multiselect" multiple
+                            data-placeholder="<%=__("Select working days") %> ">
+                            <option value><%=__("Select working days") %></option>
+                            <% if(workingDays && workingDays.length > 0) { %> 
+                                <% workingDays.forEach( item => { %>
+                                    <option value="<%= item.id %>" <%= selectedWorkingDays.includes(String(item.id)) ? 'selected' : '' %>><%= item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase() %></option>
+                                <% }) %> 
+                            <% } %>
+                        </select>
+                        <span id="workingDaysError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- other details -->
+                    <div class="col-md-12 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("Other details") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <textarea class="form-control" id="otherDetails" name="otherDetails" rows="3" placeholder="<%=__("Enter other details") %>"><%= employeeData.other_details || '' %></textarea>
+                        <span id="otherDetailsError" class="text-danger errorRemove"></span>
+                    </div>
+                    <span class="mb-3"><h5><%=__("Address") %></h5></span>
+                    <!-- country -->
+                    <div class="col-md-6 mb-3">
+                        <label for="country" class="form-label required_field"><%=__("Country") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select name="country" id="country" class="form-select country"
+                            data-placeholder="<%=__("Select Country") %>">
+                            <option value><%=__("Select Country") %></option>
+                            <% country.forEach( item => { %>
+                            <option value="<%= item.id %>"><%= item.name %></option>
+                            <% }) %>
+                        </select>
+                        <span id="countryError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- state -->
+                    <div class="col-md-6 mb-3 state-wrapper">
+                        <label class="form-label required_field"><%=__("State") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select class="form-select state" id="state" name="state"
+                            data-placeholder="<%=__("Select state") %>">
+                            <option value><%=__("Select State") %></option>
+                        </select>
+                        <span id="stateError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- city -->
+                    <div class="col-md-6 mb-3 city-wrapper">
+                        <label class="form-label required_field"><%=__("City") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <select class="form-select city" id="city" name="city"
+                            data-placeholder="<%=__("Select city") %>">
+                            <option value><%=__("Select City") %></option>
+                        </select>
+                        <span id="cityError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- address -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("Address") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control" id="address" name="address"
+                            placeholder="<%=__("Address") %>" value="<%= employeeData.address || '' %>">
+                        <span id="addressError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- postal code -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("Postal Code") %><span
+                                class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" class="form-control nvInput" id="postalCode" name="postalCode"
+                            placeholder="<%=__("Postal Code") %>" value="<%= employeeData.postal_code || '' %>">
+                        <span id="postalCodeError" class="text-danger errorRemove"></span>
+                    </div>
+                    <span class="mb-3"><h5><%=__("Financial details") %></h5></span>
+                    <!-- bank name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("Bank Name") %></label>
+                        <input type="text" class="form-control" id="bankName" name="bankName"
+                            placeholder="<%=__("Bank Name") %>" value="<%= employeeData.bank_name || '' %>">
+                        <span id="bankNameError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- account number -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input"
+                            class="form-label required_field"><%=__("Bank Account Number") %></label>
+                        <input type="text" class="form-control number_validation" id="accountNumber"
+                            name="accountNumber" placeholder="<%=__("Account Number") %>" value="<%= employeeData.account_number || '' %>">
+                        <span id="accountNumberError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- account holder name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input"
+                            class="form-label required_field"><%=__("Account Holder Name") %></label>
+                        <input type="text" class="form-control" id="accountHolder" name="accountHolder"
+                            placeholder="<%=__("Account Number") %>" value="<%= employeeData.account_holder_name || '' %>">
+                        <span id="accountHolderError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- account type -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input"
+                            class="form-label required_field"><%=__("Account Type") %></label>
+                        <select name="accountType" id="accountType" class="form-select">
+                            <option value><%=__("Select account type") %></option>
+                            <option value="savings" <%= employeeData.account_type == 'savings' ? 'selected' : '' %>><%=__("Savings") %></option>
+                            <option value="current" <%= employeeData.account_type == 'current' ? 'selected' : '' %>><%=__("Current") %></option>
+                        </select>
+                        <span id="accountTypeError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- IFSC code -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("IFSC Code") %></label>
+                        <input type="text" class="form-control" id="ifscCode" name="ifscCode"
+                            placeholder="<%=__("IFSC Code") %>" value="<%= employeeData.ifsc_code || '' %>">
+                        <span id="ifscCodeError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- branch name -->
+                    <div class="col-md-6 mb-3">
+                        <label for="example-url-input" class="form-label required_field"><%=__("Branch Name") %></label>
+                        <input type="text" class="form-control" id="branchName" name="branchName"
+                            placeholder="<%=__("Branch Name") %>" value="<%= employeeData.branch_name || '' %>">
+                        <span id="branchNameError" class="text-danger errorRemove"></span>
+                    </div>
+                    <span class="mb-3"><h5><%=__("Documents") %></h5></span>
+                    <span class="mb-3"><h6><%=__("PAN details") %></h6></span>
+                    <%
+                    let documents = [];
+                    try {
+                        documents = typeof employeeData.employee_documents === 'string' ? JSON.parse(employeeData.employee_documents)
+                        : (employeeData.employee_documents || []);
+                    } catch (e) {
+                        documents = [];
+                    }
+
+                    const getFileMeta = (key) => {
+                        const doc = documents.find(d => d.meta_key === key);
+                        const path = doc?.meta_value || '';
+                        const fileName = path.split('/').pop();
+                        const isPdf = fileName?.toLowerCase().endsWith('.pdf');
+                        const url = path ? base_url + img_url + path : '';
+                        const docId = doc?.id || '';
+                        const status = doc?.status || '';
+                        return { path, fileName, isPdf, url, docId, status };
+                    };
+
+                    const pan = getFileMeta('panFile');
+                    const aadhaarFront = getFileMeta('aadhaarFront');
+                    const aadhaarBack = getFileMeta('aadhaarBack');
+                    const profileImage = {
+                        path: employeeData.employee_image || '',
+                        fileName: (employeeData.employee_image || '').split('/').pop(),
+                        isPdf: (employeeData.employee_image || '').toLowerCase().endsWith('.pdf'),
+                        url: employeeData.employee_image ? base_url + img_url + employeeData.employee_image : ''
+                    };
+
+                    const getMetaValue = (key) => {
+                        return documents.find(d => d.meta_key === key)?.meta_value || '';
+                    };
+                    %>
+
+                    <!-- PAN Number -->
+                    <div class="col-md-6 mb-3">
+                        <label for="panNumber"><%=__("PAN Number") %><span class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" id="panNumber" name="employee[panNumber]" id="panNumber" class="form-control" placeholder="Enter PAN Number" value="<%= getMetaValue('panNumber') %>">
+                        <span id="employee_panNumberError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- PAN Upload -->
+                    <div class="col-md-6 mb-3">
+                        <label for="panNumber"><%=__("PAN Document") %><span class="text-danger"><%=__("*") %></span></label>
+                        <input type="file" class="form-control doc-upload" data-preview="#panPreview" name="panFile">
+                        <div class="img-preview <%= pan.url ? '' : 'd-none' %>" id="panPreview">
+                            <% if (pan.isPdf) { %>
+                                <div class="file-info" style="display: block;"><a href="<%= pan.url %>" target="_blank"><%= pan.fileName %></a></div>
+                                <% } else { %>
+                                <img src="<%= pan.url %>" class="img-thumbnail" style="display: inline;">
+                                <div class="file-info" style="display: none;"></div>
+                            <% } %>
+                           <% if (pan.status === 'pending') { %>
+                            <button type="button" class="btn-close-preview">×</button>
+                            <% } %>
+                            <div class="mt-2 docStatus">
+                                <% if (pan.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= pan.docId %>" data-file="Pan Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                    <% } else {%>
+                                        <span class="showDocStatus badge <%= pan.status === 'approved' ? 'bg-success' : 'bg-warning' %>">
+                                        <%= pan.status === 'approved' ? __('Approved') : __('Rejected') %>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <input type="hidden" name="panFileOld" value="<%= pan.path %>">
+                            <input type="hidden" class="removeImg" name="removePanImg" value="0">
+                        </div>
+                            <span id="panFileError" class="text-danger errorRemove"></span>
+                    </div>
+                    <span class="mb-3"><h6><%=__("Aadhaar details") %></h6></span>
+                    <!-- Aadhaar Number -->
+                    <div class="col-md-6 mb-3">
+                        <label for="aadhaarNumber"><%=__("Aadhaar Number") %><span class="text-danger"><%=__("*") %></span></label>
+                        <input type="text" id="aadhaarNumber" name="employee[aadhaarNumber]" id="aadhaarNumber" class="form-control nvInput" placeholder="<%=__("Enter Aadhaar Number") %>" value="<%= getMetaValue('aadhaarNumber') %>">
+                            <span id="employee_aadhaarNumberError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- Aadhaar Front Upload -->
+                    <div class="col-md-6 mb-3">
+                        <label><%=__("Aadhaar Card (Front)") %><span class="text-danger"><%=__("*") %></span></label>
+                        <input type="file" class="form-control doc-upload" data-preview="#aadhaarFrontPreview" name="aadhaarFront">
+                        <div class="img-preview <%= aadhaarFront.url ? '' : 'd-none' %>"" id="aadhaarFrontPreview">
+                           <% if (aadhaarFront.isPdf) { %>
+                                <div class="file-info" style="display: block;"><a href="<%= aadhaarFront.url %>" target="_blank"><%= aadhaarFront.fileName %></a></div>
+                                <% } else { %>
+                                <img src="<%= aadhaarFront.url %>" class="img-thumbnail" style="display: inline;">
+                                <div class="file-info" style="display: none;"></div>
+                            <% } %>
+                           <% if (aadhaarFront.status === 'pending') { %>
+                            <button type="button" class="btn-close-preview">×</button>
+                            <% } %>
+                             <div class="mt-2 docStatus">
+                                <% if (aadhaarFront.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= aadhaarFront.docId %>" data-file="Aadhaar Front Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= aadhaarFront.docId %>" data-file="Aadhaar Front Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                    <% } else {%>
+                                    <span class="showDocStatus badge <%= aadhaarFront.status === 'approved' ? 'bg-success' : 'bg-warning' %>">
+                                    <%= aadhaarFront.status === 'approved' ? __('Approved') : __('Rejected') %>
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <input type="hidden" name="aadhaarFrontOld" value="<%= aadhaarFront.path %>">
+                        <input type="hidden" class="removeImg" name="removeAadhaarFrontImg" value="0">
+                        <span id="aadhaarFrontError" class="text-danger errorRemove"></span>
+                    </div>
+                    <!-- Aadhaar Back Upload -->
+                    <div class="col-md-6 mb-3">
+                        <label><%=__("Aadhaar Card (Back)") %><span class="text-danger"><%=__("*") %></span></label>
+                        <input type="file" class="form-control doc-upload" data-preview="#aadhaarBackPreview"
+                            name="aadhaarBack">
+                        <div class="img-preview <%= aadhaarBack.url ? '' : 'd-none' %>"" id="aadhaarBackPreview">
+                           <% if (aadhaarBack.isPdf) { %>
+                                <div class="file-info" style="display: block;"><a href="<%= aadhaarBack.url %>" target="_blank"><%= aadhaarBack.fileName %></a></div>
+                                <% } else { %>
+                                <img src="<%= aadhaarBack.url %>" class="img-thumbnail" style="display: inline;">
+                                <div class="file-info" style="display: none;"></div>
+                            <% } %>
+                           <% if (aadhaarBack.status === 'pending') { %>
+                            <button type="button" class="btn-close-preview">×</button>
+                            <% } %>
+                             <div class="mt-2 docStatus">
+                                <% if (aadhaarBack.status === 'pending') { %>
+                                    <button type="button" class="btn btn-success action-btn btn-sm" data-action="approved" data-id="<%= aadhaarBack.docId %>" data-file="Aadhaar Back Document" data-url="<%= update_documents_status %>"><%=__("Approved") %></button>
+                                    <button type="button" class="btn btn-warning action-btn btn-sm" data-action="rejected" data-id="<%= aadhaarBack.docId %>" data-file="Aadhaar Back Document" data-url="<%= update_documents_status %>"><%=__("Rejected") %></button>
+                                    <% } else {%>
+                                    <span class="showDocStatus badge <%= aadhaarBack.status === 'approved' ? 'bg-success' : 'bg-warning' %>">
+                                    <%= aadhaarBack.status === 'approved' ? __('Approved') : __('Rejected') %>
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <input type="hidden" name="aadhaarBackOld" value="<%= aadhaarBack.path %>">
+                        <input type="hidden" class="removeImg" name="removeAadhaarBackImg" value="0">
+                        <span id="aadhaarBackError" class="text-danger errorRemove"></span>
+                    </div>
+                </div>
+                <!-- employee image -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label><%=__("Profile image") %></label>
+                        <input type="file" class="form-control doc-upload" data-preview="#employeeImagePreview"
+                            name="employeeImage" id="employeeImage">
+                        <div class="img-preview <%= profileImage.url ? '' : 'd-none' %>"" id="employeeImagePreview">
+                            <img src="<%= profileImage.isPdf ? '' : profileImage.url %>" class="img-thumbnail"style="<%= profileImage.isPdf ? 'display:none;' : 'display:inline;' %>" />
+                            <div class="file-info"style="<%= profileImage.isPdf ? 'display:block;' : 'display:none;' %>"><%= profileImage.fileName %></div>
+                            <button type="button" class="btn-close-preview">×</button>
+                            <input type="hidden" name="employeeImageOld" value="<%= profileImage.path %>">
+                            <input type="hidden" class="removeImg" name="removeemployeeImage" value="0">
+                        </div>
+                    </div>
+                </div>
+                 <input type="hidden" name="hiddenFields" id="hiddenFieldsInput" />
+                <%if(addPermission) { %>
+                <div class="float-end">
+                    <button class="btn btn-primary" type="submit"><%=__("Submit") %></button>
+                </div>
+                <% } %>
+            </form>
+        </div>
+    </div>
+</div>
+<%- include('../../common/footer') %>
+<!-- status update -->
+<script>
+$(document).on('click', '.action-btn', function () {
+    const action = $(this).data('action');
+    const docId = $(this).data('id');
+    const url = $(this).data('url');
+    const file = $(this).data('file');
+    const fileData = file ? file : '';
+    const confirmText = {
+      approved: `<%= __('Are you sure you want to approve this') %> ${fileData} ?`,
+      rejected: `<%= __('Are you sure you want to reject this') %> ${fileData} ?`,
+    };
+
+    Swal.fire({
+      title: `<%= __('Are you sure?') %>`,
+      text: confirmText[action] || '',
+      icon: "warning",
+      input: 'textarea',
+      inputLabel: '<%= __("Comment (optional)") %>',
+      inputPlaceholder: '<%= __("Write your reason or comment here...") %>',
+      inputAttributes: {'aria-label': 'Comment'},
+      showCancelButton: true,
+      confirmButtonText: `<%= __('Yes, proceed!') %>`,
+      cancelButtonText: `<%= __('No, cancel!') %>`,
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger me-2"
+      },
+      buttonsStyling: false,
+      reverseButtons: true
+    }).then(({ isConfirmed, value: comment}) => {
+      if (isConfirmed) {
+        $.post(`${$baseurl}${url}/${docId}`, { action, comment }).done(res => {
+          if (res.success) {
+            Swal.fire({
+              icon: 'success',
+              title: `<%= __('Success!') %>`,
+              text: res.success,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: `<%= __('Error') %>`,
+              text: res.error || `<%= __('Something went wrong.') %>`
+            });
+          }
+        });
+      }
+    });
+  });
+
+</script>
+
+ <!-- upload image -->
+<script>
+$(document).on('change', '.doc-upload', function () {
+  const fileInput = this;
+  const file = fileInput.files[0];
+  const previewId = $(this).data('preview');
+  const previewBox = $(previewId);
+  const previewImg = previewBox.find('img');
+  const previewText = previewBox.find('.file-info');
+  const errorSpan = $(fileInput).siblings('span.text-danger');
+  
+
+  // Reset previous state
+  errorSpan.text('');
+  previewImg.hide().attr('src', '');
+  previewText.text('').hide();
+  previewBox.addClass('d-none');
+
+  if (!file) return;
+
+  const fileType = file.type;
+  const fileSizeMB = file.size / (1024 * 1024); 
+  const fileName = file.name;
+  const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const validPdfType = 'application/pdf';
+
+  if (fileSizeMB > 2) {
+    errorSpan.text(`<%= __("File size must be less than or equal to 2MB.") %>`);
+    $(fileInput).val('');
+    return;
+  }
+
+  if (validImageTypes.includes(fileType)) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        previewImg.attr('src', e.target.result).show();
+        previewText.hide();
+        previewBox.removeClass('d-none');
+        previewBox.find('.docStatus').removeClass('d-none');
+        previewBox.find('.showDocStatus').addClass('d-none');
+      };
+      img.onerror = function () {
+        errorSpan.text(`<%= __("The selected image could not be displayed. It may be corrupted.") %>`);
+        $(fileInput).val('');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else if (fileType === validPdfType) {
+    previewImg.hide();
+    previewText.text(fileName).show();
+    previewBox.removeClass('d-none');
+    previewBox.find('.docStatus').removeClass('d-none');
+  } else {
+      previewBox.find('.docStatus').addClass('d-none');
+    errorSpan.text(`<%= __("Only JPG, PNG, and PDF files are allowed.") %>`);
+    $(fileInput).val('');
+  }
+});
+
+// Clear preview when clicking close button
+$(document).on('click', '.btn-close-preview', function () {
+  const previewBox = $(this).closest('.img-preview');
+  const previewId = previewBox.attr('id');
+  const fileInput = $(`input[data-preview="#${previewId}"]`);
+  const errorSpan = fileInput.siblings('span.text-danger');
+
+  // Reset everything
+  previewBox.addClass('d-none');
+  previewBox.find('img').attr('src', '').hide();
+  previewBox.find('.file-info').text('').hide();
+  fileInput.val('');
+  errorSpan.text('');
+  previewBox.find('.removeImg').val('1');
+  previewBox.find('.docStatus').addClass('d-none'); 
+
+});
+</script>
+<script>
+    $(document).ready(function () {
+        setTimeout(() => $('#loader').hide(), 300);
+        $('.date-wrapper').click(() => $('#dob')[0]?.showPicker?.() || $('#dob').focus());
+
+        $(document).on("input", ".number_validation", e => e.target.value = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0+(\d)/, '$1').replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'));
+        $(document).on("input", ".nvInput", e => e.target.value = e.target.value.replace(/\D/g, ''));
+
+        $('.country, .state, .city, .multiselect').select2({ placeholder: function () { return $(this).data('placeholder'); }});
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                document.querySelector('.select2-container--open .select2-search__field')?.focus();
+            }, 0);
+        })
+        function updateHiddenFields() {
+                const hidden = [];
+                ['state', 'city'].forEach(field => {
+                    const $el = $(`#${field}`);
+                    const wrapper = $el.closest('.state-wrapper, .city-wrapper, .form-group, .mb-3');
+                    if (wrapper.hasClass('d-none') || !$el.is(':visible')) {
+                        hidden.push(field);
+                    }
+                });
+                $('#hiddenFieldsInput').val(hidden.join(','));
+            }
+        // get state
+        $(document).on('change', '.country', function () {
+            const countryId = $(this).val();
+            const $stateWrapper = $('#state').closest('.state-wrapper');
+            const $cityWrapper = $('#city').closest('.city-wrapper');
+            $('#city').html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+            $('#city').prop('disabled', true);
+            $cityWrapper.removeClass('d-none');
+            $.post(`<%= base_url + get_state %>`, { country: countryId }).done(res => {
+                const states = res.state || [];
+                let stateOptions = `<option value="">${"<%= __('Select State') %>"}</option>`;
+                    if (states.length > 0) {
+                        states.forEach(s => {
+                            stateOptions += `<option value="${s.id}">${s.name}</option>`;
+                        });
+                    }
+                $('#state').html(stateOptions);
+                $('#state').val(`<%= employeeData.state %>`).trigger('change');
+
+                  if (states.length === 0) {
+                    $stateWrapper.addClass('d-none');
+                    $.post(`<%= base_url + get_city %>`, { country: countryId }, res => {
+                        const cities = res.city || [];
+                        let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                        if (cities.length > 0) {
+                            cities.forEach(c => {
+                                cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                            });
+                            $('#city').html(cityOptions);
+                            $('#city').val(`<%= employeeData.city %>`).trigger('change');
+                            $('#city').prop('disabled', false);
+                            $cityWrapper.removeClass('d-none');
+                            updateHiddenFields();
+                            $('#city').trigger('citiesLoaded');
+                        }else{
+                            $cityWrapper.addClass('d-none');
+                        }     
+                    });
+
+                } else {
+                    $stateWrapper.removeClass('d-none');
+                }
+               
+            });
+        });
+        $('.country').val(`<%= employeeData.country %>`).trigger('change');
+
+        // get city
+        $(document).on('change', '.state', function () {
+            const stateId = $(this).val();
+            const countryId = $(`.country`).val();
+            const $city = $(`#city`);
+            const $cityWrapper = $city.closest('.city-wrapper');
+             if (!stateId) {
+                $city.html(`<option value="">${"<%= __('Select City') %>"}</option>`);
+                $cityWrapper.addClass('d-none');
+                updateHiddenFields();
+                return;
+            }
+
+            $cityWrapper.removeClass('d-none');
+            $city.prop('disabled', true);
+            $.post(`<%= base_url + get_city %>`,  { country: countryId, state: stateId }).done(res => {
+                const cities = res.city || [];
+                let cityOptions = `<option value="">${"<%= __('Select City') %>"}</option>`;
+                if (cities.length > 0) {
+                    cities.forEach(c => {
+                        cityOptions += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                }
+                $city.html(cityOptions);
+                $city.prop('disabled', false);
+                $('#city').val(`<%= employeeData.city %>`).trigger('change');
+                if (cities.length === 0) {
+                    $cityWrapper.addClass('d-none');
+                }
+
+                updateHiddenFields();
+                $city.trigger('citiesLoaded');
+            });
+        });
+
+        // error remove when key text and change select
+        $('#addEmployee').on('input change', 'input, select', e => $('.errorRemove', e.target.parentElement).empty());
+        // form submit
+        $('#addEmployee').on('submit', function (e) {
+            $('#loader').show();
+            e.preventDefault();
+            const $form = $(this);
+            const formData = new FormData(this);
+            $.post({ url: $form.attr('action'), data: formData, contentType: false, processData: false }).done(res => {
+                if (res.errors) {
+                    $('#loader').hide();
+                  let firstErrorField = null;
+                    for (const field in res.errors) {
+                        const normalizedField = field.replace(/\[|\]/g, '_');
+                        let $input = $form.find(`[name="${field}"]`);
+                        const $error = $(`#${field}Error`);
+                        $error.text(res.errors[field]);
+                        if (!firstErrorField && $input.length) {
+                            firstErrorField = $input;
+                        }
+                    }
+                    if (firstErrorField) {
+                        firstErrorField.focus();
+                    }
+                } else {
+                    showMsg(res.success || res.error, res.success ? "success" : "danger");
+                    if (res.success) setTimeout(() => window.location.href = `<%= base_url + employee_list %>`, 1500);
+                    if (res.error) setTimeout(() => $('#loader').hide(), 1500);
+                }
+            });
+        });
+
+        // Toast message
+        function showMsg(msg, type = "danger") {
+            const toast = $('.toast-container');
+            toast.removeClass('d-none').find('.toast-body').attr('class', `toast-body alert alert-${type}`).text(msg);
+            setTimeout(() => toast.addClass('d-none').find('.toast-body').removeClass(`alert alert-${type}`).text(''), 1500);
+        }
+
+
+    })
+</script>
